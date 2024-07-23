@@ -20,8 +20,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-#      - name: Grant execute permission for gradlew
-#        run: chmod +x ./gradlew # gradlew를 실행할 수 있는 권한을 추가(리눅스의 명령어)
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew # gradlew를 실행할 수 있는 권한을 추가(리눅스의 명령어)
 #
 #      - name: Build with Gradle
 #        uses: gradle/gradle-build-action@v2
