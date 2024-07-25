@@ -1,5 +1,6 @@
 package knou.course.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ public class HealthCheckController {
     @Value("${serverName}")
     private String serverName;
 
+    @Operation(summary = "헬스체크", description = "헬스체크 API")
     @GetMapping("/hc")
     public ResponseEntity<?> healthCheck() {
         Map<String, String> responseDate = new HashMap<>();
