@@ -1,10 +1,10 @@
 spring:
   profiles:
-    active: blue
+    active: local
     group:
       local: local, common
-      blue: blue, common
-      green: green, common
+      blue: blue, common, secret
+      green: green, common, secret
 
 server:
   env: blue
@@ -15,12 +15,30 @@ spring:
   config:
     activate:
       on-profile: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/course
+    username: root
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+#        default_batch_fetch_size:
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+
 
 server:
   port: 8080
   serverAddress: localhost
 
 serverName: local_server
+
 
 ---
 
@@ -60,6 +78,7 @@ springdoc:
     version: 'v1'
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+  show-login-endpoint: true
 
 jwt:
   secret: aaaabbbsdifqbvaesoioegwaaaabbbsdidsfdsfdfsdfsdfsdfsdfsd
