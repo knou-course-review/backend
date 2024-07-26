@@ -1,14 +1,21 @@
 package knou.course.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import knou.course.domain.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -38,6 +45,22 @@ public class JwtUtil {
                 .get("role", String.class);
     }
 
+    public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
+        Set<SimpleGrantedAuthority> authorities =
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + claims.get("role")));
+
+        return new UsernamePasswordAuthenticationToken(claims.get("id"), null, authorities);
+    }
+
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
     public boolean isExpired(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -48,10 +71,10 @@ public class JwtUtil {
                 .before(new Date());
     }
 
-    public String createAccessToken(String username, String role, Long expiredMs) {
+    public String createAccessToken(User user, Long expiredMs) {
         return Jwts.builder()
-                .claim("username", username)
-                .claim("role", role)
+                .claim("id", user.getId())
+                .claim("role", user.getRole())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
