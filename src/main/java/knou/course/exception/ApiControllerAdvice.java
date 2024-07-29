@@ -2,6 +2,7 @@ package knou.course.exception;
 
 import knou.course.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,12 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApiControllerAdvice {
 
     @ExceptionHandler
-    public ApiResponse<Object> handleException(AppException e) {
-        return ApiResponse.of(
-                e.getErrorCode().getStatus(),
-                e.getMessage(),
-                null
-        );
+    public ResponseEntity<ApiResponse<Object>> handleException(AppException e) {
+        return ResponseEntity.status(e.getErrorCode().getStatus())
+                .body(ApiResponse.of(
+                        e.getErrorCode().getStatus(),
+                        e.getMessage(),
+                        null
+                ));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
