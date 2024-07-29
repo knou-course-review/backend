@@ -18,5 +18,24 @@ spring:
         highlight_sql: true
     open-in-view: false
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: naver@naver.com
+    password: passwordPassword
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 jwt:
   secret: aaaabbbsdifqbvaesoioegwaaaabbbsdidsfdsfdfsdfsdfsdfsdfsd
+
+server:
+  env: test
+  port: 8080
+  serverAddress: localhost
+
+serverName: local_server
