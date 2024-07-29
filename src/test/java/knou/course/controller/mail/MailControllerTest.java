@@ -50,7 +50,7 @@ class MailControllerTest {
     void createMail() throws Exception {
         // given
         MailCreateRequest request = MailCreateRequest.builder()
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .build();
 
         // when // then
@@ -86,12 +86,33 @@ class MailControllerTest {
                 .andExpect(jsonPath("$.message").value("이메일은 필수입니다."));
     }
 
+    @DisplayName("메일을 전송할 때 이메일은 @knou.ac.kr 형식이여야 한다.")
+    @Test
+    void createMailWithoutEmailPattern() throws Exception {
+        // given
+        MailCreateRequest request = MailCreateRequest.builder()
+                .email("email@naver.com")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/mail").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
+    }
+
     @DisplayName("이메일 인증")
     @Test
     void confirmMail() throws Exception {
         // given
         MailConfirmRequest request = MailConfirmRequest.builder()
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .code(123456)
                 .build();
 
@@ -129,12 +150,34 @@ class MailControllerTest {
                 .andExpect(jsonPath("$.message").value("이메일은 필수입니다."));
     }
 
+    @DisplayName("이메일 인증할 때 이메일은 @knou.ac.kr 형식이여야 한다.")
+    @Test
+    void confirmMailWithoutEmailPattern() throws Exception {
+        // given
+        MailConfirmRequest request = MailConfirmRequest.builder()
+                .email("email@naver.com")
+                .code(123456)
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/mail").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
+    }
+
     @DisplayName("이메일 인증할 때 인증번호는 100_000 이상 이다.")
     @Test
     void confirmMailWithAtLeast100_000() throws Exception {
         // given
         MailConfirmRequest request = MailConfirmRequest.builder()
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .code(99999)
                 .build();
 
@@ -156,7 +199,7 @@ class MailControllerTest {
     void confirmMailWithAtMost999_999() throws Exception {
         // given
         MailConfirmRequest request = MailConfirmRequest.builder()
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .code(1_000_000)
                 .build();
 
