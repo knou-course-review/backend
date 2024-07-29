@@ -1,6 +1,7 @@
 package knou.course.dto.user.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import knou.course.domain.user.Role;
 import knou.course.domain.user.Status;
 import knou.course.domain.user.User;
@@ -20,6 +21,7 @@ public class UserCreateRequest {
     private String password;
 
     @NotBlank(message = "이메일은 필수입니다.")
+    @Pattern(regexp = "^[\\w._%+-]+@knou\\.ac\\.kr$", message = "이메일은 @knou.ac.kr 도메인이어야 합니다.")
     private String email;
 
     @Builder

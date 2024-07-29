@@ -2,6 +2,7 @@ package knou.course.controller.user;
 
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
+import knou.course.dto.user.request.EmailRequest;
 import knou.course.dto.user.request.UserCreateRequest;
 import knou.course.dto.user.request.UsernameRequest;
 import knou.course.dto.user.response.UserResponse;
@@ -29,5 +30,10 @@ public class UserController {
     @PostMapping("/duplicate-username")
     public void duplicateUsername(@Valid @RequestBody UsernameRequest request) {
         userService.checkUsernameDuplication(request);
+    }
+
+    @PostMapping("/duplicate-email")
+    public void duplicateEmail(@Valid @RequestBody EmailRequest request) {
+        userService.checkEmailDuplication(request);
     }
 }

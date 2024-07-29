@@ -2,6 +2,7 @@ package knou.course.service.user;
 
 import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
+import knou.course.dto.user.request.EmailRequest;
 import knou.course.dto.user.request.UserCreateRequest;
 import knou.course.dto.user.request.UsernameRequest;
 import knou.course.dto.user.response.UserResponse;
@@ -32,6 +33,12 @@ public class UserService {
     public void checkUsernameDuplication(UsernameRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new AppException(ErrorCode.ALREADY_EXIST_USERNAME, ErrorCode.ALREADY_EXIST_USERNAME.getMessage());
+        }
+    }
+
+    public void checkEmailDuplication(EmailRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.ALREADY_EXIST_EMAIL, ErrorCode.ALREADY_EXIST_EMAIL.getMessage());
         }
     }
 }
