@@ -8,5 +8,5 @@ public interface MailHistoryRepository extends JpaRepository<MailHistory, Long> 
 
     Optional<MailHistory> findByEmailAndCode(String email, int code);
 
-    Optional<MailHistory> findTop1ByEmailOrderById(String email);
+    Optional<MailHistory> findTop1ByEmailOrderByIdDesc(String email);
 }

@@ -33,7 +33,7 @@ public class UserService {
         checkUsernameDuplication(request.getUsername());
         checkEmailDuplication(request.getEmail());
 
-        MailHistory mailHistory = mailHistoryRepository.findTop1ByEmailOrderById(request.getEmail())
+        MailHistory mailHistory = mailHistoryRepository.findTop1ByEmailOrderByIdDesc(request.getEmail())
                 .orElseThrow(() -> new AppException(NOT_FOUND_EMAIL_AUTHENTICATION, NOT_FOUND_EMAIL_AUTHENTICATION.getMessage()));
 
         if (!mailHistory.isConfirm()) {
