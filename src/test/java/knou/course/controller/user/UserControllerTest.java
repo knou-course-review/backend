@@ -3,6 +3,7 @@ package knou.course.controller.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.user.request.UserCreateRequest;
+import knou.course.dto.user.request.UsernameRequest;
 import knou.course.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -132,5 +133,44 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("이메일은 필수입니다."));
+    }
+
+    @DisplayName("아이디 중복검사")
+    @Test
+    void duplicateUsername() throws Exception {
+        // given
+        UsernameRequest request = UsernameRequest.builder()
+                .username("username")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/duplicate-username").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("아이디 중복검사할 때 아이디는 필수값이다.")
+    @Test
+    void duplicateUsernameWithoutUsername() throws Exception {
+        // given
+        UsernameRequest request = UsernameRequest.builder()
+//                .username("username")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/duplicate-username").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("아이디는 필수입니다."));
     }
 }
