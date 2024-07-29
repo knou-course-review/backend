@@ -41,7 +41,7 @@ class UserServiceTest {
                 .build();
 
         // when // then
-        userService.checkUsernameDuplication(request);
+        userService.checkUsernameDuplication(request.getUsername());
     }
 
     @DisplayName("중복된 아이디가 존재하여 예외가 발생한다.")
@@ -57,7 +57,7 @@ class UserServiceTest {
                 .build();
 
         // when // then
-        assertThatThrownBy(() -> userService.checkUsernameDuplication(request))
+        assertThatThrownBy(() -> userService.checkUsernameDuplication(request.getUsername()))
                 .isInstanceOf(AppException.class)
                 .hasMessage("이미 존재하는 유저입니다.");
     }
@@ -72,7 +72,7 @@ class UserServiceTest {
                 .build();
 
         // when // then
-        userService.checkEmailDuplication(request);
+        userService.checkEmailDuplication(request.getEmail());
     }
 
     @DisplayName("중복된 이메일이 존재하여 예외가 발생한다.")
@@ -88,7 +88,7 @@ class UserServiceTest {
                 .build();
 
         // when // then
-        assertThatThrownBy(() -> userService.checkEmailDuplication(request))
+        assertThatThrownBy(() -> userService.checkEmailDuplication(request.getEmail()))
                 .isInstanceOf(AppException.class)
                 .hasMessage("이미 존재하는 유저입니다.");
     }

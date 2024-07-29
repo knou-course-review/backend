@@ -29,11 +29,11 @@ public class UserController {
 
     @PostMapping("/duplicate-username")
     public void duplicateUsername(@Valid @RequestBody UsernameRequest request) {
-        userService.checkUsernameDuplication(request);
+        userService.checkUsernameDuplication(request.getUsername());
     }
 
     @PostMapping("/duplicate-email")
     public void duplicateEmail(@Valid @RequestBody EmailRequest request) {
-        userService.checkEmailDuplication(request);
+        userService.checkEmailDuplication(request.getEmail());
     }
 }

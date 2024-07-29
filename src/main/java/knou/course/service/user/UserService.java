@@ -30,14 +30,14 @@ public class UserService {
         return UserResponse.of(savedUser);
     }
 
-    public void checkUsernameDuplication(UsernameRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+    public void checkUsernameDuplication(final String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
             throw new AppException(ErrorCode.ALREADY_EXIST_USERNAME, ErrorCode.ALREADY_EXIST_USERNAME.getMessage());
         }
     }
 
-    public void checkEmailDuplication(EmailRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+    public void checkEmailDuplication(final String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new AppException(ErrorCode.ALREADY_EXIST_EMAIL, ErrorCode.ALREADY_EXIST_EMAIL.getMessage());
         }
     }
