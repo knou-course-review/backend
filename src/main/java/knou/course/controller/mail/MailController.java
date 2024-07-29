@@ -20,7 +20,8 @@ public class MailController {
 
     @PostMapping
     public ApiResponse<MailResponse> createMail(@Valid @RequestBody MailCreateRequest request) {
-        return ApiResponse.ok(mailService.mailSend(request));
+        LocalDateTime now = LocalDateTime.now();
+        return ApiResponse.ok(mailService.mailSend(request, now));
     }
 
     @PutMapping

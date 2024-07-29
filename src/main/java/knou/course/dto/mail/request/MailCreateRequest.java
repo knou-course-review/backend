@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class MailCreateRequest {
@@ -21,11 +23,12 @@ public class MailCreateRequest {
         this.email = email;
     }
 
-    public MailHistory toEntity(final int code, final boolean confirm) {
+    public MailHistory toEntity(final int code, final boolean confirm, final LocalDateTime registeredDateTime) {
         return MailHistory.builder()
                 .email(email)
                 .code(code)
                 .confirm(confirm)
+                .registeredDateTime(registeredDateTime)
                 .build();
     }
 }
