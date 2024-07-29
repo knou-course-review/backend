@@ -4,6 +4,9 @@ import knou.course.domain.mail.MailHistory;
 import knou.course.domain.mail.MailHistoryRepository;
 import knou.course.dto.mail.request.MailConfirmRequest;
 import knou.course.dto.mail.request.MailCreateRequest;
+import knou.course.dto.mail.response.MailResponse;
+import knou.course.exception.AppException;
+import knou.course.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,40 +16,42 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static knou.course.exception.ErrorCode.EXPIRED_MAIL_AUTHENTICATION;
+import static knou.course.exception.ErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class MailService {
 
-    private final JavaMailSender mailSender;
+    private final MailClient mailClient;
     private final MailHistoryRepository mailHistoryRepository;
 
-    public int mailSend(final MailCreateRequest request) {
-        int code = createRandomNumber();
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(request.getEmail());
-        message.setSubject("회원가입 인증번호입니다.");
-        message.setText(String.valueOf(code));
-        mailSender.send(message);
+    @Transactional
+    public MailResponse mailSend(final MailCreateRequest request, final LocalDateTime registeredDateTime) {
+        int code = mailClient.createRandomNumber();
+        boolean result = mailClient.sendMail(request.getEmail(), "회원가입 인증번호입니다.", String.valueOf(code));
 
-        mailHistoryRepository.save(request.toEntity(code, false));
+        if (!result) {
+            throw new RuntimeException("메일 전송에 실패했습니다.");
+        }
 
-        return code;
+        MailHistory savedMailHistory = mailHistoryRepository.save(request.toEntity(code, false, registeredDateTime));
+        return MailResponse.of(savedMailHistory);
     }
 
     @Transactional
-    public void confirmMail(final MailConfirmRequest request, final LocalDateTime now) {
+    public MailResponse confirmMail(final MailConfirmRequest request, final LocalDateTime now) {
         MailHistory mailHistory = mailHistoryRepository.findByEmailAndCode(request.getEmail(), request.getCode())
-                .orElseThrow(() -> new IllegalArgumentException(""));
+                .orElseThrow(() -> new AppException(NOT_FOUND_EMAIL_AUTHENTICATION, NOT_FOUND_EMAIL_AUTHENTICATION.getMessage()));
 
-        if (now.isAfter(mailHistory.getCreatedAt().plusMinutes(5))) {
-            throw new IllegalArgumentException("");
+        if (now.isAfter(mailHistory.getRegisteredDateTime().plusMinutes(5))) {
+            throw new AppException(EXPIRED_MAIL_AUTHENTICATION, EXPIRED_MAIL_AUTHENTICATION.getMessage());
         }
 
         mailHistory.updateConfirm(true);
+
+        return MailResponse.of(mailHistory);
     }
 
-    private int createRandomNumber() {
-        return 100000 + (int) (Math.random() * 900000);
-    }
 }

@@ -32,11 +32,14 @@ public class MailHistory extends BaseEntity {
 
     private boolean confirm;
 
+    private LocalDateTime registeredDateTime;
+
     @Builder
-    public MailHistory(final String email, final int code, final boolean confirm) {
+    public MailHistory(final String email, final int code, final boolean confirm, final LocalDateTime registeredDateTime) {
         this.email = email;
         this.code = code;
         this.confirm = confirm;
+        this.registeredDateTime = registeredDateTime;
     }
 
     public void updateConfirm(final boolean confirm) {
