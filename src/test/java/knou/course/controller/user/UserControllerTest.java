@@ -2,6 +2,7 @@ package knou.course.controller.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import knou.course.dto.user.request.EmailRequest;
 import knou.course.dto.user.request.UserCreateRequest;
 import knou.course.dto.user.request.UsernameRequest;
 import knou.course.service.user.UserService;
@@ -51,7 +52,7 @@ class UserControllerTest {
         UserCreateRequest request = UserCreateRequest.builder()
                 .username("username")
                 .password("password")
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .build();
 
         // when // then
@@ -73,7 +74,7 @@ class UserControllerTest {
         UserCreateRequest request = UserCreateRequest.builder()
 //                .username("username")
                 .password("password")
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .build();
 
         // when // then
@@ -96,7 +97,7 @@ class UserControllerTest {
         UserCreateRequest request = UserCreateRequest.builder()
                 .username("username")
 //                .password("password")
-                .email("email@naver.com")
+                .email("email@knou.ac.kr")
                 .build();
 
         // when // then
@@ -133,6 +134,29 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("이메일은 필수입니다."));
+    }
+
+    @DisplayName("회원가입할 때 이메일은 @knou.ac.kr 형식이여야 한다.")
+    @Test
+    void createUserWithoutEmailPattern() throws Exception {
+        // given
+        UserCreateRequest request = UserCreateRequest.builder()
+                .username("username")
+                .password("password")
+                .email("email@naver.com")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/sign-up").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
     }
 
     @DisplayName("아이디 중복검사")
@@ -173,4 +197,65 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("아이디는 필수입니다."));
     }
+
+    @DisplayName("이메일 중복검사")
+    @Test
+    void duplicateEmail() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+                .email("email@knou.ac.kr")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/duplicate-email").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("이메일 중복검사할 때 이메일은 필수값이다.")
+    @Test
+    void duplicateEmailWithoutEmail() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+//                .email("email@naver.com")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/duplicate-email").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 필수입니다."));
+    }
+
+    @DisplayName("이메일 중복검사할 때 이메일은 @knou.ac.kr 형식이여야한다.")
+    @Test
+    void duplicateEmailWithoutEmailPattern() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+                .email("email@naver.com")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/duplicate-email").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
+    }
+
 }
