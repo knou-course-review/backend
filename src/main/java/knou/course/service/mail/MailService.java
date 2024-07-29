@@ -4,6 +4,7 @@ import knou.course.domain.mail.MailHistory;
 import knou.course.domain.mail.MailHistoryRepository;
 import knou.course.dto.mail.request.MailConfirmRequest;
 import knou.course.dto.mail.request.MailCreateRequest;
+import knou.course.dto.mail.response.MailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,7 +22,7 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final MailHistoryRepository mailHistoryRepository;
 
-    public int mailSend(final MailCreateRequest request) {
+    public MailResponse mailSend(final MailCreateRequest request) {
         int code = createRandomNumber();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(request.getEmail());
@@ -29,13 +30,13 @@ public class MailService {
         message.setText(String.valueOf(code));
         mailSender.send(message);
 
-        mailHistoryRepository.save(request.toEntity(code, false));
+        MailHistory savedMailHistory = mailHistoryRepository.save(request.toEntity(code, false));
 
-        return code;
+        return MailResponse.of(savedMailHistory);
     }
 
     @Transactional
-    public void confirmMail(final MailConfirmRequest request, final LocalDateTime now) {
+    public MailResponse confirmMail(final MailConfirmRequest request, final LocalDateTime now) {
         MailHistory mailHistory = mailHistoryRepository.findByEmailAndCode(request.getEmail(), request.getCode())
                 .orElseThrow(() -> new IllegalArgumentException(""));
 
@@ -44,6 +45,8 @@ public class MailService {
         }
 
         mailHistory.updateConfirm(true);
+
+        return MailResponse.of(mailHistory);
     }
 
     private int createRandomNumber() {
