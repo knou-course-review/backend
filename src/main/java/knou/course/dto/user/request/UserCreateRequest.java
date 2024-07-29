@@ -1,5 +1,6 @@
 package knou.course.dto.user.request;
 
+import jakarta.validation.constraints.NotBlank;
 import knou.course.domain.user.Role;
 import knou.course.domain.user.Status;
 import knou.course.domain.user.User;
@@ -12,10 +13,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserCreateRequest {
 
+    @NotBlank(message = "아이디는 필수입니다.")
     private String username;
 
+    @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 
+    @NotBlank(message = "이메일은 필수입니다.")
     private String email;
 
     @Builder

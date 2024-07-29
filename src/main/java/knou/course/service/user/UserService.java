@@ -1,7 +1,9 @@
 package knou.course.service.user;
 
+import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
 import knou.course.dto.user.request.UserCreateRequest;
+import knou.course.dto.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,7 +20,9 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public void singUp(UserCreateRequest request) {
-        userRepository.save(request.toEntity(passwordEncoder.encode(request.getPassword())));
+    public UserResponse singUp(UserCreateRequest request) {
+        User savedUser = userRepository.save(request.toEntity(passwordEncoder.encode(request.getPassword())));
+
+        return UserResponse.of(savedUser);
     }
 }
