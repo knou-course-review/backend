@@ -1,5 +1,6 @@
 package knou.course.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import knou.course.jwt.JwtFilter;
 import knou.course.jwt.JwtUtil;
 import knou.course.jwt.LoginFilter;
@@ -14,6 +15,10 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 //@RequiredArgsConstructor
 @Configuration
@@ -35,6 +40,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(cors -> cors
+                        .configurationSource(new CorsConfigurationSource() {
+                            @Override
+                            public CorsConfiguration getCorsConfiguration(final HttpServletRequest request) {
+                                CorsConfiguration configuration = new CorsConfiguration();
+                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                configuration.setAllowedMethods(Collections.singletonList("*"));
+                                configuration.setAllowCredentials(true);
+                                configuration.setAllowedHeaders(Collections.singletonList("*"));
+                                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+
+                                return configuration;
+                            }
+                        }))
                 .httpBasic(HttpBasicConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
