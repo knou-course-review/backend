@@ -112,7 +112,7 @@ class MailServiceTest {
                 .isInstanceOf(AppException.class);
     }
 
-    @DisplayName("이메일 인증을 하지 않고 회원가입을 시도하면 예외가 발생한다.")
+    @DisplayName("이메일 인증 버튼을 누르지 않고 인증확인을 시도하면 예외가 발생한다.")
     @Test
     void confirmMailWithoutSendMail() {
         // given
