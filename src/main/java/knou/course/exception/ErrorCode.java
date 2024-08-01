@@ -13,7 +13,10 @@ public enum ErrorCode {
     ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
 
     NOT_FOUND_EMAIL_AUTHENTICATION(HttpStatus.NOT_FOUND, "이메일 인증이 필요합니다."),
-    EXPIRED_MAIL_AUTHENTICATION(HttpStatus.BAD_REQUEST, "인증 시간을 초과하였습니다.");
+    EXPIRED_MAIL_AUTHENTICATION(HttpStatus.BAD_REQUEST, "인증 시간을 초과하였습니다."),
+
+    // Department
+    ALREADY_EXIST_DEPARTMENT_NAME(HttpStatus.CONFLICT, "이미 존재하는 학과명입니다.");
 
     private final HttpStatus status;
 
