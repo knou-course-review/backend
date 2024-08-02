@@ -54,4 +54,12 @@ public class DepartmentService {
         department.updateDepartmentName(request.getDepartmentName());
         return DepartmentResponse.of(department);
     }
+
+    @Transactional
+    public void deleteDepartment(final Long departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_DEPARTMENT, NOT_FOUND_DEPARTMENT.getMessage()));
+
+        departmentRepository.delete(department);
+    }
 }

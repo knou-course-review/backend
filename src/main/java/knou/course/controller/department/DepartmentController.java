@@ -38,4 +38,10 @@ public class DepartmentController {
         return ApiResponse.ok(departmentService.updateDepartmentName(departmentId, request));
     }
 
+    @DeleteMapping("/api/v1/department/{departmentId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteDepartment(@PathVariable Long departmentId) {
+        departmentService.deleteDepartment(departmentId);
+    }
+
 }
