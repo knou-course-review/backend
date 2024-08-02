@@ -37,4 +37,10 @@ public class ProfessorController {
                                                           @Valid @RequestBody ProfessorUpdateRequest request) {
         return ApiResponse.ok(professorService.updateProfessor(professorId, request));
     }
+
+    @DeleteMapping("/api/v1/professor/{professorId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteProfessor(@PathVariable Long professorId) {
+        professorService.deleteProfessor(professorId);
+    }
 }

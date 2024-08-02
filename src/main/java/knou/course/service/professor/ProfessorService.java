@@ -55,4 +55,12 @@ public class ProfessorService {
 
         return ProfessorResponse.of(professor, department);
     }
+
+    @Transactional
+    public void deleteProfessor(final Long professorId) {
+        Professor professor = professorRepository.findById(professorId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_PROFESSOR, NOT_FOUND_PROFESSOR.getMessage()));
+
+        professorRepository.delete(professor);
+    }
 }
