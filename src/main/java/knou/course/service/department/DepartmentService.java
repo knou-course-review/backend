@@ -47,6 +47,10 @@ public class DepartmentService {
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_DEPARTMENT, NOT_FOUND_DEPARTMENT.getMessage()));
 
+        if (departmentRepository.existsByDepartmentName(request.getDepartmentName())) {
+            throw new AppException(ALREADY_EXIST_DEPARTMENT_NAME, ALREADY_EXIST_DEPARTMENT_NAME.getMessage());
+        }
+
         department.updateDepartmentName(request.getDepartmentName());
         return DepartmentResponse.of(department);
     }
