@@ -5,6 +5,7 @@ import knou.course.domain.department.DepartmentRepository;
 import knou.course.domain.professor.Professor;
 import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.professor.request.ProfessorCreateRequest;
+import knou.course.dto.professor.request.ProfessorUpdateRequest;
 import knou.course.dto.professor.response.ProfessorResponse;
 import knou.course.exception.AppException;
 import org.assertj.core.api.Assertions;
@@ -96,6 +97,52 @@ class ProfessorServiceTest {
                         tuple("학과명2", "교수명2"),
                         tuple("학과명3", "교수명3")
                 );
+    }
+
+    @DisplayName("등록되어있는 교수를 수정한다.")
+    @Test
+    void updateProfessor() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        departmentRepository.save(department1);
+
+        Professor professor1 = createProfessor("교수명1", department1);
+        professorRepository.save(professor1);
+
+        ProfessorUpdateRequest request = ProfessorUpdateRequest.builder()
+                .professorName("수정된 교수명")
+                .departmentName("학과명1")
+                .build();
+
+        // when
+        ProfessorResponse professorResponse = professorService.updateProfessor(professor1.getId(), request);
+
+        // then
+        assertThat(professorResponse.getId()).isNotNull();
+        assertThat(professorResponse)
+                .extracting("departmentName", "professorName")
+                .containsExactlyInAnyOrder("학과명1", "수정된 교수명");
+    }
+
+    @DisplayName("등록되어있는 교수를 수정할 때, 존재하지 않는 학과명이면 예외가 발생한다.")
+    @Test
+    void updateProfessorWithDepartment() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        departmentRepository.save(department1);
+
+        Professor professor1 = createProfessor("교수명1", department1);
+        professorRepository.save(professor1);
+
+        ProfessorUpdateRequest request = ProfessorUpdateRequest.builder()
+                .professorName("수정된 교수명")
+                .departmentName("수정된 학과명")
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> professorService.updateProfessor(professor1.getId(), request))
+                .isInstanceOf(AppException.class)
+                .hasMessage("존재하지 않는 학과입니다.");
     }
 
     private Department createDepartment(final String departmentName) {
