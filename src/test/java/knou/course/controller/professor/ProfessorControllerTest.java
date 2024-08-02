@@ -3,9 +3,11 @@ package knou.course.controller.professor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.professor.request.ProfessorCreateRequest;
+import knou.course.dto.professor.response.ProfessorResponse;
 import knou.course.service.professor.ProfessorService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,8 +16,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -120,5 +125,25 @@ class ProfessorControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isForbidden());
+    }
+
+    @DisplayName("교수 전체 목록을 조회한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void getAllProfessors() throws Exception {
+        // given
+        List<ProfessorResponse> result = List.of();
+
+        BDDMockito.given(professorService.getAllProfessors()).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/professors").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"));
     }
 }

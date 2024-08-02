@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,9 +71,43 @@ class ProfessorServiceTest {
                 .hasMessage("존재하지 않는 학과입니다.");
     }
 
+    @DisplayName("등록되어있는 교수 전체 목록을 조회한다.")
+    @Test
+    void getAllProfessors() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        Department department2 = createDepartment("학과명2");
+        Department department3 = createDepartment("학과명3");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        Professor professor1 = createProfessor("교수명1", department1);
+        Professor professor2 = createProfessor("교수명2", department2);
+        Professor professor3 = createProfessor("교수명3", department3);
+        professorRepository.saveAll(List.of(professor1, professor2, professor3));
+
+        // when
+        List<ProfessorResponse> result = professorService.getAllProfessors();
+
+        // then
+        assertThat(result).hasSize(3)
+                .extracting("departmentName", "professorName")
+                .containsExactlyInAnyOrder(
+                        tuple("학과명1", "교수명1"),
+                        tuple("학과명2", "교수명2"),
+                        tuple("학과명3", "교수명3")
+                );
+    }
+
     private Department createDepartment(final String departmentName) {
         return Department.builder()
                 .departmentName(departmentName)
+                .build();
+    }
+
+    private Professor createProfessor(final String professorName, Department department) {
+        return Professor.builder()
+                .professorName(professorName)
+                .department(department)
                 .build();
     }
 }
