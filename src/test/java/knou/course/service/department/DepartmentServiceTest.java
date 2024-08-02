@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -76,6 +78,28 @@ class DepartmentServiceTest {
         assertThatThrownBy(() -> departmentService.createDepartment(request))
                 .isInstanceOf(AppException.class)
                 .hasMessage("이미 존재하는 학과명입니다.");
+    }
+
+    @DisplayName("학과명을 전체 조회한다.")
+    @Test
+    void getAllDepartments() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        Department department2 = createDepartment("학과명2");
+        Department department3 = createDepartment("학과명3");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        // when
+        List<DepartmentResponse> result = departmentService.getAllDepartments();
+
+        // then
+        assertThat(result).hasSize(3)
+                .extracting("id", "departmentName")
+                .containsExactlyInAnyOrder(
+                        tuple(department1.getId(), "학과명1"),
+                        tuple(department2.getId(), "학과명2"),
+                        tuple(department3.getId(), "학과명3")
+                );
     }
 
     private User createUser(final String username, final String password, final String email) {
