@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static knou.course.exception.ErrorCode.ALREADY_EXIST_DEPARTMENT_NAME;
 
 @RequiredArgsConstructor
@@ -28,5 +30,13 @@ public class DepartmentService {
         Department savedDepartment = departmentRepository.save(request.toEntity());
 
         return DepartmentResponse.of(savedDepartment);
+    }
+
+    public List<DepartmentResponse> getAllDepartments() {
+        List<Department> departmentList = departmentRepository.findAll();
+
+        return departmentList.stream()
+                .map(DepartmentResponse::of)
+                .toList();
     }
 }
