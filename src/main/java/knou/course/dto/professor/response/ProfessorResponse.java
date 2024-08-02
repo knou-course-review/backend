@@ -31,4 +31,12 @@ public class ProfessorResponse {
                 .departmentName(department.getDepartmentName())
                 .build();
     }
+
+    public static ProfessorResponse of(Professor professor) {
+        return ProfessorResponse.builder()
+                .id(professor.getId())
+                .professorName(professor.getProfessorName())
+                .departmentName(professor.getDepartment().getDepartmentName())
+                .build();
+    }
 }

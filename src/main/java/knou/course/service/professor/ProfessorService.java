@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static knou.course.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
@@ -30,5 +32,13 @@ public class ProfessorService {
         Professor savedProfessor = professorRepository.save(request.toEntity(department));
 
         return ProfessorResponse.of(savedProfessor, department);
+    }
+
+    public List<ProfessorResponse> getAllProfessors() {
+        List<Professor> professors = professorRepository.findAll();
+
+        return professors.stream()
+                .map(ProfessorResponse::of)
+                .toList();
     }
 }
