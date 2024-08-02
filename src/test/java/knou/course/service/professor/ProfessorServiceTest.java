@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -143,6 +144,24 @@ class ProfessorServiceTest {
         assertThatThrownBy(() -> professorService.updateProfessor(professor1.getId(), request))
                 .isInstanceOf(AppException.class)
                 .hasMessage("존재하지 않는 학과입니다.");
+    }
+
+    @DisplayName("등록되어있는 교수를 삭제한다.")
+    @Test
+    void deleteProfessor() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        departmentRepository.save(department1);
+
+        Professor professor1 = createProfessor("교수명1", department1);
+        professorRepository.save(professor1);
+
+        // when
+        professorService.deleteProfessor(professor1.getId());
+
+        // then
+        assertThatThrownBy(() -> professorRepository.findById(professor1.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private Department createDepartment(final String departmentName) {

@@ -234,4 +234,30 @@ class ProfessorControllerTest {
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
+
+    @DisplayName("등록된 교수를 삭제한다.")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void deleteProfessor() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("등록된 교수를 삭제할 때, ADMIN이 아니면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void deleteProfessorWithoutAdmin() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 }
