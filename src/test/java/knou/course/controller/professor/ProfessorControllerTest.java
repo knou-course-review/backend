@@ -3,6 +3,7 @@ package knou.course.controller.professor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.professor.request.ProfessorCreateRequest;
+import knou.course.dto.professor.request.ProfessorUpdateRequest;
 import knou.course.dto.professor.response.ProfessorResponse;
 import knou.course.service.professor.ProfessorService;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -145,5 +145,93 @@ class ProfessorControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("OK"));
+    }
+
+    @DisplayName("등록된 교수 수정")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void updateProfessor() throws Exception {
+        // given
+        ProfessorUpdateRequest request = ProfessorUpdateRequest.builder()
+                .professorName("교수명")
+                .departmentName("학과명")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"));
+    }
+
+    @DisplayName("등록된 교수를 수정할 때, 교수명이 없으면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void updateProfessorWithoutProfessorName() throws Exception {
+        // given
+        ProfessorUpdateRequest request = ProfessorUpdateRequest.builder()
+//                .professorName("교수명")
+                .departmentName("학과명")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("교수명은 필수입니다."));
+    }
+
+    @DisplayName("등록된 교수를 수정할 때, 학과명이 없으면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void updateProfessorWithoutDepartmentName() throws Exception {
+        // given
+        ProfessorUpdateRequest request = ProfessorUpdateRequest.builder()
+                .professorName("교수명")
+//                .departmentName("학과명")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("학과명은 필수입니다."));
+    }
+
+    @DisplayName("등록된 교수를 수정할 때, ADMIN이 아니면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void updateProfessorWithoutAdmin() throws Exception {
+        // given
+        ProfessorUpdateRequest request = ProfessorUpdateRequest.builder()
+                .professorName("교수명")
+                .departmentName("학과명")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 }
