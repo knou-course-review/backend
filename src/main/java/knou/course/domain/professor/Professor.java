@@ -28,4 +28,9 @@ public class Professor extends BaseEntity {
         this.professorName = professorName;
         this.department = department;
     }
+
+    public void updateProfessor(final String professorName, final Department department) {
+        this.professorName = professorName;
+        this.department = department;
+    }
 }
