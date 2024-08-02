@@ -3,6 +3,7 @@ package knou.course.controller.department;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.department.request.DepartmentCreateRequest;
+import knou.course.dto.department.request.DepartmentUpdateNameRequest;
 import knou.course.dto.department.response.DepartmentResponse;
 import knou.course.service.department.DepartmentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -127,4 +127,66 @@ class DepartmentControllerTest {
                 .andExpect(jsonPath("$.message").value("OK"));
     }
 
+    @DisplayName("학과명 수정")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void updateDepartmentName() throws Exception {
+        // given
+        DepartmentUpdateNameRequest request = DepartmentUpdateNameRequest.builder()
+                .departmentName("수정한 학과명")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/department/{departmentId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"));
+    }
+
+    @DisplayName("학과명을 수정할 때 학과명이 비어있으면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void updateDepartmentNameWithoutName() throws Exception {
+        // given
+        DepartmentUpdateNameRequest request = DepartmentUpdateNameRequest.builder()
+//                .departmentName("수정한 학과명")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/department/{departmentId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("학과명은 필수입니다."));
+    }
+
+    @DisplayName("학과명을 수정할 때 ADMIN이 아니면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void updateDepartmentWithoutAdmin() throws Exception {
+        // given
+        DepartmentUpdateNameRequest request = DepartmentUpdateNameRequest.builder()
+                .departmentName("수정한 학과명")
+                .build();
+
+        // TODO: 핸들러 적용하여 Response 생성
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/department/{departmentId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 }
