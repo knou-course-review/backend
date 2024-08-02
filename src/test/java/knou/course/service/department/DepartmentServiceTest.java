@@ -7,6 +7,7 @@ import knou.course.domain.user.Status;
 import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
 import knou.course.dto.department.request.DepartmentCreateRequest;
+import knou.course.dto.department.request.DepartmentUpdateNameRequest;
 import knou.course.dto.department.response.DepartmentResponse;
 import knou.course.exception.AppException;
 import org.assertj.core.api.Assertions;
@@ -100,6 +101,46 @@ class DepartmentServiceTest {
                         tuple(department2.getId(), "학과명2"),
                         tuple(department3.getId(), "학과명3")
                 );
+    }
+
+    @DisplayName("학과명을 수정한다.")
+    @Test
+    void updateDepartmentName() {
+        // given
+        Department department = createDepartment("학과명");
+        departmentRepository.save(department);
+
+        DepartmentUpdateNameRequest request = DepartmentUpdateNameRequest.builder()
+                .departmentName("수정된 이름")
+                .build();
+
+        // when
+        DepartmentResponse departmentResponse = departmentService.updateDepartmentName(department.getId(), request);
+
+        // then
+        assertThat(departmentResponse.getId()).isNotNull();
+        assertThat(departmentResponse)
+                .extracting("id", "departmentName")
+                .containsExactlyInAnyOrder(
+                        departmentResponse.getId(), "수정된 이름"
+                );
+    }
+
+    @DisplayName("학과명을 수정할 때 이미 존재하는 이름이면 예외가 발생한다.")
+    @Test
+    void updateDepartmentNameDuplicateDepartmentName() {
+        // given
+        Department department = createDepartment("학과명");
+        departmentRepository.save(department);
+
+        DepartmentUpdateNameRequest request = DepartmentUpdateNameRequest.builder()
+                .departmentName("학과명")
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> departmentService.updateDepartmentName(department.getId(), request))
+                .isInstanceOf(AppException.class)
+                .hasMessage("이미 존재하는 학과명입니다.");
     }
 
     private User createUser(final String username, final String password, final String email) {
