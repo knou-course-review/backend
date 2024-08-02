@@ -17,7 +17,10 @@ public enum ErrorCode {
 
     // Department
     ALREADY_EXIST_DEPARTMENT_NAME(HttpStatus.CONFLICT, "이미 존재하는 학과명입니다."),
-    NOT_FOUND_DEPARTMENT(HttpStatus.NOT_FOUND, "존재하지 않는 학과입니다.");
+    NOT_FOUND_DEPARTMENT(HttpStatus.NOT_FOUND, "존재하지 않는 학과입니다."),
+
+    // Professor;
+    NOT_FOUND_PROFESSOR(HttpStatus.NOT_FOUND, "존재하지 않는 교수입니다.");
 
     private final HttpStatus status;
 
