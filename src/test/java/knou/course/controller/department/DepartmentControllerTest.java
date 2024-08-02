@@ -189,4 +189,30 @@ class DepartmentControllerTest {
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
+
+    @DisplayName("학과 삭제")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void deleteDepartment() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/department/{departmentId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("학과를 삭제할 때 ADMIN이 아니면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void deleteDepartmentWithoutAdmin() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/department/{departmentId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 }
