@@ -24,4 +24,8 @@ public class Department {
     public Department(final String departmentName) {
         this.departmentName = departmentName;
     }
+
+    public void updateDepartmentName(final String departmentName) {
+        this.departmentName = departmentName;
+    }
 }
