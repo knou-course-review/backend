@@ -1,5 +1,6 @@
 package knou.course.dto.course.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import knou.course.domain.course.Course;
 import knou.course.domain.department.Department;
 import lombok.AccessLevel;
@@ -14,12 +15,16 @@ import java.util.Map;
 @Getter
 public class CourseListResponse {
 
+    @Schema(example = "1")
     private Long id;
 
+    @Schema(example = "이산수학")
     private String courseName;
 
+    @Schema(example = "컴퓨터과학")
     private String departmentName;
 
+    @Schema(example = "홍길동")
     private String professorName;
 
     @Builder

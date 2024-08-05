@@ -1,5 +1,6 @@
 package knou.course.dto.user.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +10,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserLoginRequest {
 
+    @Schema(example = "아이디")
     private String username;
 
+    @Schema(example = "비밀번호")
     private String password;
 
     @Builder
