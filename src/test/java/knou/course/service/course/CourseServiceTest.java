@@ -7,6 +7,7 @@ import knou.course.domain.department.DepartmentRepository;
 import knou.course.domain.professor.Professor;
 import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
+import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
 import knou.course.dto.course.response.CourseResponse;
 import org.assertj.core.api.Assertions;
@@ -96,6 +97,29 @@ class CourseServiceTest {
                         tuple("글쓰기", "국어국문학과교수", "국어국문학과"),
                         tuple("영어쓰기", "영어영문학과교수", "영어영문학과")
                 );
+    }
+
+    @DisplayName("등록된 강의를 수정한다.")
+    @Test
+    void updateCourse() {
+        // given
+        Course course = createCourse(1L, 1L, "운영체제");
+        courseRepository.save(course);
+
+        CourseUpdateRequest request = CourseUpdateRequest.builder()
+                .courseName("이산수학")
+                .professorId(1L)
+                .departmentId(1L)
+                .build();
+
+        // when
+        CourseResponse courseResponse = courseService.updateCourse(course.getId(), request);
+
+        // then
+        assertThat(courseResponse.getId()).isNotNull();
+        assertThat(courseResponse)
+                .extracting("courseName", "professorId", "departmentId")
+                .containsExactlyInAnyOrder("이산수학", 1L, 1L);
     }
 
     private Department createDepartment(final String departmentName) {
