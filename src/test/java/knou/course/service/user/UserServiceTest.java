@@ -18,6 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
+
+import static knou.course.exception.ErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION;
+import static knou.course.exception.ErrorCode.NOT_FOUND_USER;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -151,6 +155,76 @@ class UserServiceTest {
                 .hasMessage("이메일 인증이 필요합니다.");
     }
 
+    @DisplayName("이메일로 아이디를 찾는다.")
+    @Test
+    void findUsername() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        final String email = "email@knou.ac.kr";
+        MailHistory mailHistory = createMailHistory(email, 123456, true, now);
+        mailHistoryRepository.save(mailHistory);
+
+        User user = createUser("username", "password", email);
+        userRepository.save(user);
+
+        EmailRequest request = EmailRequest.builder()
+                .email(email)
+                .build();
+
+        // when
+        UserResponse userResponse = userService.findUsername(request);
+
+        // then
+        assertThat(userResponse.getId()).isNotNull();
+        assertThat(userResponse)
+                .extracting("username", "email")
+                .containsExactlyInAnyOrder(
+                        "username", "email@knou.ac.kr"
+                );
+    }
+
+    @DisplayName("이메일로 아이디를 찾을 때, 이메일 인증이 되어있지 않으면 예외가 발생한다.")
+    @Test
+    void findUsernameWithoutEmailAuthentication() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        final String email = "email@knou.ac.kr";
+        MailHistory mailHistory = createMailHistory(email, 123456, false, now);
+        mailHistoryRepository.save(mailHistory);
+
+        User user = createUser("username", "password", email);
+        userRepository.save(user);
+
+        EmailRequest request = EmailRequest.builder()
+                .email(email)
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> userService.findUsername(request))
+                .isInstanceOf(AppException.class)
+                .hasMessage(NOT_FOUND_EMAIL_AUTHENTICATION.getMessage());
+    }
+
+    @DisplayName("이메일로 아이디를 찾을 때, 이메일 인증을 해도 회원가입이 되어있지 않으면 예외가 발생한다.")
+    @Test
+    void findUsernameWithoutUser() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        final String email = "email@knou.ac.kr";
+        MailHistory mailHistory = createMailHistory(email, 123456, false, now);
+        mailHistoryRepository.save(mailHistory);
+
+
+        EmailRequest request = EmailRequest.builder()
+                .email(email)
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> userService.findUsername(request))
+                .isInstanceOf(AppException.class)
+                .hasMessage(NOT_FOUND_USER.getMessage());
+    }
+
     private User createUser(final String username, final String password, final String email) {
         return User.builder()
                 .username(username)
@@ -158,6 +232,15 @@ class UserServiceTest {
                 .email(email)
                 .role(Role.USER)
                 .status(Status.ACTIVE)
+                .build();
+    }
+
+    private MailHistory createMailHistory(final String email, final int code, final boolean confirm, final LocalDateTime now) {
+        return MailHistory.builder()
+                .email(email)
+                .code(code)
+                .confirm(confirm)
+                .registeredDateTime(now)
                 .build();
     }
 }

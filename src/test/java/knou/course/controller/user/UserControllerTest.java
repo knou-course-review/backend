@@ -258,4 +258,43 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
     }
 
+    @DisplayName("이메일로 아이디 찾기")
+    @Test
+    void findUsernameWithEmail() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+                .email("email@knou.ac.kr")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-username").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("이메일로 아이디를 찾을 때 이메일은 @knou.ac.kr 형식이여야한다.")
+    @Test
+    void findUsernameWithoutEmailPattern() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+                .email("email@naver.com")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-username").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
+    }
+
 }
