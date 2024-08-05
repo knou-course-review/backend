@@ -20,7 +20,10 @@ public enum ErrorCode {
     NOT_FOUND_DEPARTMENT(HttpStatus.NOT_FOUND, "존재하지 않는 학과입니다."),
 
     // Professor;
-    NOT_FOUND_PROFESSOR(HttpStatus.NOT_FOUND, "존재하지 않는 교수입니다.");
+    NOT_FOUND_PROFESSOR(HttpStatus.NOT_FOUND, "존재하지 않는 교수입니다."),
+
+    // Course
+    NOT_FOUND_COURSE(HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다.");
 
     private final HttpStatus status;
 
