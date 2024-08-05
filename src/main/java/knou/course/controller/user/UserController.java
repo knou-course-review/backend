@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @Operation(summary = "비밀번호 변경", description = "비밀번호를 변경합니다.")
-    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_EMAIL_AUTHENTICATION, NOT_FOUND_USER})
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_EMAIL_AUTHENTICATION, NOT_FOUND_USER, NOT_MATCH_PASSWORD})
     @PutMapping("/change-password")
     public ApiResponse<UserResponse> changePassword(@Valid @RequestBody UserChangePassword request) {
         return ApiResponse.ok(userService.changePassword(request));
