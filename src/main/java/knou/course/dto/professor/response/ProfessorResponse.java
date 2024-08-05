@@ -1,5 +1,6 @@
 package knou.course.dto.professor.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import knou.course.domain.department.Department;
 import knou.course.domain.professor.Professor;
 import lombok.AccessLevel;
@@ -11,10 +12,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ProfessorResponse {
 
+    @Schema(example = "1")
     private Long id;
 
+    @Schema(example = "홍길동")
     private String professorName;
 
+    @Schema(example = "컴퓨터과학")
     private String departmentName;
 
     @Builder

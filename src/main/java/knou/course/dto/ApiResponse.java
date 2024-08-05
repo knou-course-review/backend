@@ -1,5 +1,6 @@
 package knou.course.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +10,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ApiResponse<T> {
 
+    @Schema(example = "200")
     private int code;
 
+    @Schema(example = "OK")
     private HttpStatus status;
 
+    @Schema(example = "OK")
     private String message;
 
     private T data;
