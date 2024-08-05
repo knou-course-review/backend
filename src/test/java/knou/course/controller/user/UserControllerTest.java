@@ -2,9 +2,7 @@ package knou.course.controller.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import knou.course.dto.user.request.EmailRequest;
-import knou.course.dto.user.request.UserCreateRequest;
-import knou.course.dto.user.request.UsernameRequest;
+import knou.course.dto.user.request.*;
 import knou.course.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -258,4 +257,127 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
     }
 
+    @DisplayName("이메일로 아이디 찾기")
+    @Test
+    void findUsernameWithEmail() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+                .email("email@knou.ac.kr")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-username").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("이메일로 아이디를 찾을 때 이메일은 @knou.ac.kr 형식이여야한다.")
+    @Test
+    void findUsernameWithoutEmailPattern() throws Exception {
+        // given
+        EmailRequest request = EmailRequest.builder()
+                .email("email@naver.com")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-username").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
+    }
+
+    @DisplayName("비밀번호 재설정을 위해 이메일과 아이디로 이메일 인증 확인")
+    @Test
+    void findPasswordWithEmailAndUsername() throws Exception {
+        // given
+        UserFindPasswordRequest request = UserFindPasswordRequest.builder()
+                .email("email@knou.ac.kr")
+                .username("username")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("비밀번호 재설정을 위해 이메일 인증을 확인할 때, 이메일은 @knou.ac.kr 형식이여야한다.")
+    @Test
+    void findPasswordWithoutEmailPattern() throws Exception {
+        // given
+        UserFindPasswordRequest request = UserFindPasswordRequest.builder()
+                .email("email@naver.com")
+                .username("username")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 @knou.ac.kr 도메인이어야 합니다."));
+    }
+
+    @DisplayName("비밀번호 재설정을 위해 이메일 인증을 확인할 때, 아이디는 필수값이다.")
+    @Test
+    void findPasswordWithoutUsername() throws Exception {
+        // given
+        UserFindPasswordRequest request = UserFindPasswordRequest.builder()
+                .email("email@knou.ac.kr")
+//                .username("username")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/v1/users/find-password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("아이디는 필수입니다."));
+    }
+
+    @DisplayName("비밀번를 변경한다.")
+    @Test
+    void changePassword() throws Exception {
+        // given
+        UserChangePassword request = UserChangePassword.builder()
+                .email("email@knou.ac.kr")
+                .password("password")
+                .rePassword("password")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/users/change-password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"));
+    }
 }
