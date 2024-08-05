@@ -18,6 +18,7 @@ public enum ErrorCode {
     ALREADY_EXIST_USERNAME(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
     ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
+    NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
     // Email
     NOT_FOUND_EMAIL_AUTHENTICATION(HttpStatus.NOT_FOUND, "이메일 인증이 필요합니다."),
