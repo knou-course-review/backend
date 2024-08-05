@@ -37,4 +37,10 @@ public class CourseController {
         return ApiResponse.ok(courseService.updateCourse(courseId, request));
     }
 
+    @DeleteMapping("/api/v1/course/{courseId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteCourse(@PathVariable Long courseId) {
+        courseService.deleteCourse(courseId);
+    }
+
 }

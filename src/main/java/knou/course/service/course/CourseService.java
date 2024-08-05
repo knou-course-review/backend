@@ -63,6 +63,14 @@ public class CourseService {
         return CourseResponse.of(course);
     }
 
+    @Transactional
+    public void deleteCourse(final Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_COURSE, NOT_FOUND_COURSE.getMessage()));
+
+        courseRepository.delete(course);
+    }
+
     private Map<Long, String> findProfessorNamesBy(final List<Course> courses) {
         List<Long> professorIds = courses.stream()
                 .map(Course::getProfessorId)
