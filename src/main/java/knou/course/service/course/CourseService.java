@@ -8,8 +8,11 @@ import knou.course.domain.department.DepartmentRepository;
 import knou.course.domain.professor.Professor;
 import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
+import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
 import knou.course.dto.course.response.CourseResponse;
+import knou.course.exception.AppException;
+import knou.course.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static knou.course.exception.ErrorCode.NOT_FOUND_COURSE;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,6 +51,24 @@ public class CourseService {
         return courses.stream()
                 .map(course -> CourseListResponse.of(course, professorNameMap, departmentNameMap))
                 .toList();
+    }
+
+    @Transactional
+    public CourseResponse updateCourse(final Long courseId, final CourseUpdateRequest request) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_COURSE, NOT_FOUND_COURSE.getMessage()));
+
+        course.updateCourse(request);
+
+        return CourseResponse.of(course);
+    }
+
+    @Transactional
+    public void deleteCourse(final Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_COURSE, NOT_FOUND_COURSE.getMessage()));
+
+        courseRepository.delete(course);
     }
 
     private Map<Long, String> findProfessorNamesBy(final List<Course> courses) {

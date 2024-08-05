@@ -3,15 +3,13 @@ package knou.course.controller.course;
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.course.request.CourseCreateRequest;
+import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.service.course.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,9 +30,17 @@ public class CourseController {
         return ApiResponse.ok(courseService.getAllCourses());
     }
 
-//    @GetMapping("/api/v1/courses")
-//    public ApiResponse<List<CourseResponse>> getAllCourses() {
-//        return ApiResponse.ok(courseService.getAllCourses());
-//    }
+    @PutMapping("/api/v1/course/{courseId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<CourseResponse> updateCourse(@PathVariable Long courseId,
+                                                    @Valid @RequestBody CourseUpdateRequest request) {
+        return ApiResponse.ok(courseService.updateCourse(courseId, request));
+    }
+
+    @DeleteMapping("/api/v1/course/{courseId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteCourse(@PathVariable Long courseId) {
+        courseService.deleteCourse(courseId);
+    }
 
 }

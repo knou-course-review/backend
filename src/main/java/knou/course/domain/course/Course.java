@@ -2,6 +2,7 @@ package knou.course.domain.course;
 
 import jakarta.persistence.*;
 import knou.course.domain.BaseEntity;
+import knou.course.dto.course.request.CourseUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,5 +44,16 @@ public class Course extends BaseEntity {
         this.classType = classType;
         this.classification = classification;
         this.semester = semester;
+    }
+
+    public void updateCourse(CourseUpdateRequest request) {
+        this.courseName = request.getCourseName();
+        this.departmentId = request.getDepartmentId();
+        this.professorId = request.getProfessorId();
+        this.grade = request.getGrade();
+        this.credit = request.getCredit();
+        this.classType = request.getClassType();
+        this.classification = request.getClassification();
+        this.semester = request.getSemester();
     }
 }
