@@ -46,4 +46,11 @@ public class UserController {
     public void duplicateEmail(@Valid @RequestBody EmailRequest request) {
         userService.checkEmailDuplication(request.getEmail());
     }
+
+    @Operation(summary = "아이디 찾기", description = "가입한 이메일로 아이디를 찾습니다.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_EMAIL_AUTHENTICATION})
+    @PostMapping("/find-username")
+    public ApiResponse<UserResponse> findUsername(@Valid @RequestBody EmailRequest request) {
+        return ApiResponse.ok(userService.findUsername(request));
+    }
 }
