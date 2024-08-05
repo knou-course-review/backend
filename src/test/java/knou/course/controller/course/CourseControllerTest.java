@@ -220,4 +220,30 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("강의명은 필수입니다."));
     }
+
+    @DisplayName("등록된 강의를 삭제한다.")
+    @WithMockUser(username = "1", roles = "ADMIN")
+    @Test
+    void deleteCourse() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/course/{courseId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("등록된 강의를 삭제할 때, ADMIN이 아니면 예외가 발생한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void deleteCourseWithoutAdmin() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/course/{courseId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 }

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,6 +121,21 @@ class CourseServiceTest {
         assertThat(courseResponse)
                 .extracting("courseName", "professorId", "departmentId")
                 .containsExactlyInAnyOrder("이산수학", 1L, 1L);
+    }
+
+    @DisplayName("등록된 강의를 삭제한다.")
+    @Test
+    void deleteCourse() {
+        // given
+        Course course = createCourse(1L, 1L, "강의");
+        courseRepository.save(course);
+
+        // when
+        courseService.deleteCourse(course.getId());
+
+        // then
+        assertThatThrownBy(() -> courseRepository.findById(course.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private Department createDepartment(final String departmentName) {
