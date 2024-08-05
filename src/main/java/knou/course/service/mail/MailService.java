@@ -16,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static knou.course.exception.ErrorCode.EXPIRED_MAIL_AUTHENTICATION;
-import static knou.course.exception.ErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION;
+import static knou.course.exception.ErrorCode.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class MailService {
         boolean result = mailClient.sendMail(request.getEmail(), "회원가입 인증번호입니다.", String.valueOf(code));
 
         if (!result) {
-            throw new RuntimeException("메일 전송에 실패했습니다.");
+            throw new AppException(MAIL_ERROR, MAIL_ERROR.getMessage());
         }
 
         MailHistory savedMailHistory = mailHistoryRepository.save(request.toEntity(code, false, registeredDateTime));
