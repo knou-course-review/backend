@@ -100,6 +100,23 @@ class CourseServiceTest {
                 );
     }
 
+    @DisplayName("선택한 강의를 조회한다.")
+    @Test
+    void getCourseById() {
+        // given
+        Course course = createCourse(1L, 1L, "운영체제");
+        courseRepository.save(course);
+
+        // when
+        CourseResponse courseResponse = courseService.getCourseById(course.getId());
+
+        // then
+        assertThat(courseResponse.getId()).isNotNull();
+        assertThat(courseResponse)
+                .extracting("departmentId", "professorId", "courseName")
+                .containsExactlyInAnyOrder(1L, 1L, "운영체제");
+    }
+
     @DisplayName("등록된 강의를 수정한다.")
     @Test
     void updateCourse() {
