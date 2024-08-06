@@ -147,6 +147,28 @@ class ProfessorControllerTest {
                 .andExpect(jsonPath("$.message").value("OK"));
     }
 
+    @DisplayName("선택한 교수를 조회한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void getProfessorById() throws Exception {
+        // given
+        ProfessorResponse result = ProfessorResponse.builder().build();
+
+        BDDMockito.given(professorService.getProfessorById(1L)).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/professor/{professorId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
     @DisplayName("등록된 교수 수정")
     @WithMockUser(username = "1", roles = "ADMIN")
     @Test

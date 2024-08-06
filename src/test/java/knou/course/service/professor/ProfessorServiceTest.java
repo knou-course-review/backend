@@ -100,6 +100,30 @@ class ProfessorServiceTest {
                 );
     }
 
+    @DisplayName("선택한 교수를 조회한다.")
+    @Test
+    void getProfessorById() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        Department department2 = createDepartment("학과명2");
+        Department department3 = createDepartment("학과명3");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        Professor professor1 = createProfessor("교수명1", department1);
+        Professor professor2 = createProfessor("교수명2", department2);
+        Professor professor3 = createProfessor("교수명3", department3);
+        professorRepository.saveAll(List.of(professor1, professor2, professor3));
+
+        // when
+        ProfessorResponse professorResponse = professorService.getProfessorById(professor1.getId());
+
+        // then
+        assertThat(professorResponse.getId()).isNotNull();
+        assertThat(professorResponse)
+                .extracting("departmentName", "professorName")
+                .containsExactlyInAnyOrder("학과명1", "교수명1");
+    }
+
     @DisplayName("등록되어있는 교수를 수정한다.")
     @Test
     void updateProfessor() {
