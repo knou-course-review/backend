@@ -10,10 +10,14 @@ import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.exception.AppException;
 import knou.course.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +55,26 @@ public class CourseService {
         return courses.stream()
                 .map(course -> CourseListResponse.of(course, professorNameMap, departmentNameMap))
                 .toList();
+    }
+
+    public CoursePagedResponse getAllCoursesPaged(Integer page) {
+        if (page < 1) {
+            page = 1;
+        }
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("courseName").ascending());
+        Page<Course> courses = courseRepository.findAll(pageRequest);
+
+        Map<Long, String> departmentNameMap = findDepartmentNamesBy(courses.getContent());
+
+        Map<Long, String> professorNameMap = findProfessorNamesBy(courses.getContent());
+
+        List<CourseListResponse> result = courses.getContent()
+                .stream()
+                .map(course -> CourseListResponse.of(course, professorNameMap, departmentNameMap))
+                .toList();
+
+        return CoursePagedResponse.of(result, courses);
     }
 
     public CourseResponse getCourseById(final Long courseId) {
