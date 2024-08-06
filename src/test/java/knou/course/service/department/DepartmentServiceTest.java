@@ -104,6 +104,25 @@ class DepartmentServiceTest {
                 );
     }
 
+    @DisplayName("선택한 학과를 조회한다.")
+    @Test
+    void getDepartmentById() {
+        // given
+        Department department1 = createDepartment("학과명1");
+        Department department2 = createDepartment("학과명2");
+        Department department3 = createDepartment("학과명3");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        // when
+        DepartmentResponse departmentResponse = departmentService.getDepartmentById(department1.getId());
+
+        // then
+        assertThat(departmentResponse.getId()).isNotNull();
+        assertThat(departmentResponse)
+                .extracting("id", "departmentName")
+                .containsExactlyInAnyOrder(department1.getId(), "학과명1");
+    }
+
     @DisplayName("학과명을 수정한다.")
     @Test
     void updateDepartmentName() {
