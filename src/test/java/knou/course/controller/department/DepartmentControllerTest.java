@@ -127,6 +127,28 @@ class DepartmentControllerTest {
                 .andExpect(jsonPath("$.message").value("OK"));
     }
 
+    @DisplayName("선택한 학과를 조회한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void getDepartmentById() throws Exception {
+        // given
+        DepartmentResponse result = DepartmentResponse.builder().build();
+
+        BDDMockito.given(departmentService.getDepartmentById(1L)).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/department/{departmentId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
     @DisplayName("학과명 수정")
     @WithMockUser(username = "1", roles = "ADMIN")
     @Test

@@ -42,6 +42,13 @@ public class DepartmentService {
                 .toList();
     }
 
+    public DepartmentResponse getDepartmentById(final Long departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_DEPARTMENT, NOT_FOUND_DEPARTMENT.getMessage()));
+
+        return DepartmentResponse.of(department);
+    }
+
     @Transactional
     public DepartmentResponse updateDepartmentName(final Long departmentId, final DepartmentUpdateNameRequest request) {
         Department department = departmentRepository.findById(departmentId)

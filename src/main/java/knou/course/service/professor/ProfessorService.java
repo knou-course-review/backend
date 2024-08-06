@@ -43,6 +43,13 @@ public class ProfessorService {
                 .toList();
     }
 
+    public ProfessorResponse getProfessorById(final Long professorId) {
+        Professor professor = professorRepository.findById(professorId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_PROFESSOR, NOT_FOUND_PROFESSOR.getMessage()));
+
+        return ProfessorResponse.of(professor);
+    }
+
     @Transactional
     public ProfessorResponse updateProfessor(final Long professorId, final ProfessorUpdateRequest request) {
         Professor professor = professorRepository.findById(professorId)
