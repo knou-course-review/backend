@@ -1,6 +1,7 @@
 package knou.course.controller.department;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.department.request.DepartmentCreateRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static knou.course.exception.ErrorCode.*;
 
+@Tag(name = "Department Controller - 학과 컨트롤러", description = "학과를 등록, 수정, 삭제, 조회합니다.")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -37,6 +39,13 @@ public class DepartmentController {
     @GetMapping("/api/v1/departments")
     public ApiResponse<List<DepartmentResponse>> getAllDepartments() {
         return ApiResponse.ok(departmentService.getAllDepartments());
+    }
+
+    @Operation(summary = "학과 단건 조회", description = "선택한 학과를 조회합니다.")
+    @ApiErrorCodeExamples({NOT_FOUND_DEPARTMENT, INVALID_INPUT_VALUE})
+    @GetMapping("/api/v1/department/{departmentId}")
+    public ApiResponse<DepartmentResponse> getDepartmentById(@PathVariable Long departmentId) {
+        return ApiResponse.ok(departmentService.getDepartmentById(departmentId));
     }
 
     @Operation(summary = "학과 수정", description = "학과를 수정합니다.")
