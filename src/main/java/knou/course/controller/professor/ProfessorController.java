@@ -1,6 +1,7 @@
 package knou.course.controller.professor;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.professor.request.ProfessorCreateRequest;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static knou.course.exception.ErrorCode.*;
 
+@Tag(name = "Professor Controller - 교수 컨트롤러", description = "교수를 등록, 수정, 삭제, 조회합니다.")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -36,6 +38,13 @@ public class ProfessorController {
     @GetMapping("/api/v1/professors")
     public ApiResponse<List<ProfessorResponse>> getAllProfessors() {
         return ApiResponse.ok(professorService.getAllProfessors());
+    }
+
+    @Operation(summary = "교수 단건 조회", description = "선택한 교수를 조회합니다.")
+    @ApiErrorCodeExamples({NOT_FOUND_PROFESSOR, INVALID_INPUT_VALUE})
+    @GetMapping("/api/v1/professor/{professorId}")
+    public ApiResponse<ProfessorResponse> getProfessorById(@PathVariable Long professorId) {
+        return ApiResponse.ok(professorService.getProfessorById(professorId));
     }
 
     @Operation(summary = "교수 수정", description = "교수를 수정합니다.")
