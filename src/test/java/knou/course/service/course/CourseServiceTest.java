@@ -9,6 +9,7 @@ import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -115,6 +116,39 @@ class CourseServiceTest {
         assertThat(courseResponse)
                 .extracting("departmentId", "professorId", "courseName")
                 .containsExactlyInAnyOrder(1L, 1L, "운영체제");
+    }
+
+    @DisplayName("등록된 강의를 페이징 조회한다. 고정 size - 10, courseName 정렬까지 테스트")
+    @Test
+    void getAllCoursesPaged() {
+        // given
+        final Integer page = 1;
+        Department department1 = createDepartment("컴퓨터과학과");
+        Department department2 = createDepartment("국어국문학과");
+        Department department3 = createDepartment("영어영문학과");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        Professor professor1 = createProfessor("컴퓨터과학과교수", department1);
+        Professor professor2 = createProfessor("국어국문학과교수", department2);
+        Professor professor3 = createProfessor("영어영문학과교수", department3);
+        professorRepository.saveAll(List.of(professor1, professor2, professor3));
+
+        Course course1 = createCourse(department1.getId(), professor1.getId(), "디지털논리회로");
+        Course course2 = createCourse(department2.getId(), professor2.getId(), "글쓰기");
+        Course course3 = createCourse(department3.getId(), professor3.getId(), "영어쓰기");
+        courseRepository.saveAll(List.of(course1, course2, course3));
+
+        // when
+        CoursePagedResponse pagedResponse = courseService.getAllCoursesPaged(page);
+
+        // then
+        assertThat(pagedResponse.getContent()).hasSize(3)
+                .extracting("courseName", "professorName", "departmentName")
+                .containsExactly(
+                        tuple("글쓰기", "국어국문학과교수", "국어국문학과"),
+                        tuple("디지털논리회로", "컴퓨터과학과교수", "컴퓨터과학과"),
+                        tuple("영어쓰기", "영어영문학과교수", "영어영문학과")
+                );
     }
 
     @DisplayName("등록된 강의를 수정한다.")
