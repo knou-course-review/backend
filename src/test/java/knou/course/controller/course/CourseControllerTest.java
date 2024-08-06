@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.dto.professor.request.ProfessorUpdateRequest;
 import knou.course.service.course.CourseService;
@@ -150,6 +151,28 @@ class CourseControllerTest {
         // when // then
         mockMvc.perform(
                         get("/api/v1/course/{courseId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+    @DisplayName("강의를 페이징 조회한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void getAllCoursesPaged() throws Exception {
+        // given
+        CoursePagedResponse result = CoursePagedResponse.builder().build();
+
+        BDDMockito.given(courseService.getAllCoursesPaged(1)).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v2/courses").with(csrf())
+                                .param("page", "1")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())

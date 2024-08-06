@@ -7,12 +7,14 @@ import knou.course.dto.ApiResponse;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.exception.ErrorCode;
 import knou.course.service.course.CourseService;
 import knou.course.swagger.ApiErrorCodeExample;
 import knou.course.swagger.ApiErrorCodeExamples;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +49,12 @@ public class CourseController {
     @GetMapping("/api/v1/course/{courseId}")
     public ApiResponse<CourseResponse> getCourseById(@PathVariable Long courseId) {
         return ApiResponse.ok(courseService.getCourseById(courseId));
+    }
+
+    @Operation(summary = "강의 페이징 조회 - size 10 고정", description = "강의를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
+    @GetMapping("/api/v2/courses")
+    public ApiResponse<CoursePagedResponse> getAllCoursesPaged(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+        return ApiResponse.ok(courseService.getAllCoursesPaged(page));
     }
 
     @Operation(summary = "강의 수정", description = "강의를 수정합니다.")
