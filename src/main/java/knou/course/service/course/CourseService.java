@@ -53,6 +53,13 @@ public class CourseService {
                 .toList();
     }
 
+    public CourseResponse getCourseById(final Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_COURSE, NOT_FOUND_COURSE.getMessage()));
+
+        return CourseResponse.of(course);
+    }
+
     @Transactional
     public CourseResponse updateCourse(final Long courseId, final CourseUpdateRequest request) {
         Course course = courseRepository.findById(courseId)

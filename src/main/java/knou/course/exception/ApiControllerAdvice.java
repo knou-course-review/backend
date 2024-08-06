@@ -1,6 +1,7 @@
 package knou.course.exception;
 
 import knou.course.dto.ApiResponse;
+import knou.course.swagger.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -31,4 +32,14 @@ public class ApiControllerAdvice {
                 null
         );
     }
+
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(BindException.class)
+//    public ErrorResponseDto bindException(BindException e) {
+//        return new ErrorResponseDto(
+//                HttpStatus.BAD_REQUEST.value(),
+//                HttpStatus.BAD_REQUEST.name(),
+//                e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+//        );
+//    }
 }

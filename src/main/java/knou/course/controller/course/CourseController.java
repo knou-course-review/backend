@@ -1,6 +1,7 @@
 package knou.course.controller.course;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.course.request.CourseCreateRequest;
@@ -17,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static knou.course.exception.ErrorCode.INVALID_INPUT_VALUE;
+import static knou.course.exception.ErrorCode.NOT_FOUND_COURSE;
+
+@Tag(name = "Course Controller - 강의 컨트롤러", description = "강의를 등록, 수정, 삭제, 조회합니다.")
 @RequiredArgsConstructor
 @RestController
 public class CourseController {
@@ -37,8 +42,15 @@ public class CourseController {
         return ApiResponse.ok(courseService.getAllCourses());
     }
 
+    @Operation(summary = "강의 단건 조회", description = "선택한 강의를 조회합니다.")
+    @ApiErrorCodeExamples({NOT_FOUND_COURSE, INVALID_INPUT_VALUE})
+    @GetMapping("/api/v1/course/{courseId}")
+    public ApiResponse<CourseResponse> getCourseById(@PathVariable Long courseId) {
+        return ApiResponse.ok(courseService.getCourseById(courseId));
+    }
+
     @Operation(summary = "강의 수정", description = "강의를 수정합니다.")
-    @ApiErrorCodeExamples({ErrorCode.NOT_ADMIN, ErrorCode.NOT_FOUND_COURSE, ErrorCode.INVALID_INPUT_VALUE})
+    @ApiErrorCodeExamples({ErrorCode.NOT_ADMIN, NOT_FOUND_COURSE, ErrorCode.INVALID_INPUT_VALUE})
     @PutMapping("/api/v1/course/{courseId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<CourseResponse> updateCourse(@PathVariable Long courseId,
@@ -47,7 +59,7 @@ public class CourseController {
     }
 
     @Operation(summary = "강의 삭제", description = "강의를 삭제합니다.")
-    @ApiErrorCodeExamples({ErrorCode.NOT_ADMIN, ErrorCode.NOT_FOUND_COURSE})
+    @ApiErrorCodeExamples({ErrorCode.NOT_ADMIN, NOT_FOUND_COURSE})
     @DeleteMapping("/api/v1/course/{courseId}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCourse(@PathVariable Long courseId) {
