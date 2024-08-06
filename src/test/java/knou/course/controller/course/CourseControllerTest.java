@@ -138,6 +138,27 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.message").value("OK"));
     }
 
+    @DisplayName("선택한 강의를 조회한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void getCourseById() throws Exception {
+        // given
+        CourseResponse result = CourseResponse.builder().build();
+
+        BDDMockito.given(courseService.getCourseById(1L)).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/course/{courseId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
     @DisplayName("등록된 강의 수정")
     @WithMockUser(username = "1", roles = "ADMIN")
     @Test
