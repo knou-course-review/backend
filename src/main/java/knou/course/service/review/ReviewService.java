@@ -6,8 +6,10 @@ import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.response.ReviewListResponse;
+import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.dto.review.response.ReviewResponse;
+import knou.course.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static knou.course.exception.ErrorCode.NOT_FOUND_REVIEW;
 
 @RequiredArgsConstructor
 @Service
@@ -60,5 +64,12 @@ public class ReviewService {
 
         return users.stream()
                 .collect(Collectors.toMap(User::getId, User::getUsername));
+    }
+
+    public ReviewOneResponse getReviewById(final Long reviewId, final Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_REVIEW, NOT_FOUND_REVIEW.getMessage()));
+
+        return ReviewOneResponse.of(review, userId);
     }
 }

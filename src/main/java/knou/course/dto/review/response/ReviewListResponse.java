@@ -1,5 +1,6 @@
 package knou.course.dto.review.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import knou.course.domain.review.Review;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,18 +14,25 @@ import java.util.Map;
 @Getter
 public class ReviewListResponse {
 
+    @Schema(example = "1")
     private Long id;
 
+    @Schema(example = "1")
     private Long userId;
 
+    @Schema(example = "강의 추천합니다.")
     private String content;
 
+    @Schema(example = "홍길동")
     private String username;
 
+    @Schema(example = "13")
     private Long courseId;
 
+    @Schema(example = "true, false")
     private boolean isOwner;
 
+    @Schema(example = "2024-08-08 13:11:21.122801")
     private LocalDateTime createdAt;
 
     @Builder

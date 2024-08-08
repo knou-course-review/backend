@@ -32,7 +32,10 @@ public enum ErrorCode {
     NOT_FOUND_PROFESSOR(HttpStatus.NOT_FOUND, "존재하지 않는 교수입니다."),
 
     // Course
-    NOT_FOUND_COURSE(HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다.");
+    NOT_FOUND_COURSE(HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다."),
+
+    // Review
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다.");
 
     private final HttpStatus status;
 
