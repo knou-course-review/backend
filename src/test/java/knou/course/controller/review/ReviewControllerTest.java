@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.service.review.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +104,26 @@ class ReviewControllerTest {
         mockMvc.perform(
                         get("/api/v2/reviews").with(csrf())
                                 .param("page", "1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+    @DisplayName("선택한 리뷰를 조회한다.")
+    @Test
+    void getReviewById() throws Exception {
+        // given
+        ReviewOneResponse result = ReviewOneResponse.builder().build();
+
+        BDDMockito.given(reviewService.getReviewById(1L, 1L)).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/review/{reviewId}", 1L).with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())

@@ -7,6 +7,7 @@ import knou.course.domain.review.Review;
 import knou.course.domain.review.ReviewRepository;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.dto.review.response.ReviewResponse;
 import org.assertj.core.api.Assertions;
@@ -79,6 +80,42 @@ class ReviewServiceTest {
                         tuple(2L, "내용2", false),
                         tuple(1L, "내용1", true)
                 );
+    }
+
+    @DisplayName("선택한 리뷰를 조회한다. (본인 작성 isOwner true)")
+    @Test
+    void getReviewByIdWithOwnerIsTrue() {
+        // given
+        final Long userId = 1L;
+        Review review = createReview("내용1", 1L, 1L);
+        reviewRepository.save(review);
+
+        // when
+        ReviewOneResponse reviewOneResponse = reviewService.getReviewById(review.getId(), userId);
+
+        // then
+        assertThat(reviewOneResponse.getId()).isNotNull();
+        assertThat(reviewOneResponse)
+                .extracting("userId", "content", "isOwner")
+                .containsExactlyInAnyOrder(1L, "내용1", true);
+    }
+
+    @DisplayName("선택한 리뷰를 조회한다. (타인 작성 isOwner false)")
+    @Test
+    void getReviewByIdWithOwnerIsFalse() {
+        // given
+        final Long userId = 2L;
+        Review review = createReview("내용1", 1L, 1L);
+        reviewRepository.save(review);
+
+        // when
+        ReviewOneResponse reviewOneResponse = reviewService.getReviewById(review.getId(), userId);
+
+        // then
+        assertThat(reviewOneResponse.getId()).isNotNull();
+        assertThat(reviewOneResponse)
+                .extracting("userId", "content", "isOwner")
+                .containsExactlyInAnyOrder(1L, "내용1", false);
     }
 
     private Review createReview(final String content, final Long courseId, final Long userId) {
