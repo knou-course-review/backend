@@ -7,9 +7,11 @@ import knou.course.domain.review.Review;
 import knou.course.domain.review.ReviewRepository;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.request.ReviewUpdateRequest;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.dto.review.response.ReviewResponse;
+import knou.course.exception.AppException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -116,6 +118,46 @@ class ReviewServiceTest {
         assertThat(reviewOneResponse)
                 .extracting("userId", "content", "isOwner")
                 .containsExactlyInAnyOrder(1L, "내용1", false);
+    }
+
+    @DisplayName("선택한 리뷰를 수정한다.")
+    @Test
+    void updateReview() {
+        // given
+        final Long userId = 1L;
+        Review review = createReview("내용1", 1L, 1L);
+        reviewRepository.save(review);
+
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+                .content("수정")
+                .build();
+
+        // when
+        ReviewResponse reviewResponse = reviewService.updateReview(review.getId(), userId, request);
+
+        // then
+        assertThat(reviewResponse.getId()).isNotNull();
+        assertThat(reviewResponse)
+                .extracting("userId", "courseId", "content")
+                .containsExactlyInAnyOrder(1L, 1L, "수정");
+    }
+
+    @DisplayName("선택한 리뷰를 수정할 때, 본인이 작성한 리뷰가 아니면 예외가 발생한다.")
+    @Test
+    void updateReviewWithNotAuthority() {
+        // given
+        final Long userId = 1L;
+        Review review = createReview("내용1", 1L, 2L);
+        reviewRepository.save(review);
+
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+                .content("수정")
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(review.getId(), userId, request))
+                .isInstanceOf(AppException.class)
+                .hasMessage("권한이 존재하지 않습니다.");
     }
 
     private Review createReview(final String content, final Long courseId, final Long userId) {

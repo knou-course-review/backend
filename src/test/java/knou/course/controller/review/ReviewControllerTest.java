@@ -2,8 +2,10 @@ package knou.course.controller.review;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.request.ReviewUpdateRequest;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.service.review.ReviewService;
@@ -25,8 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -131,5 +132,46 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("OK"))
                 .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+    @DisplayName("등록된 리뷰 수정")
+    @Test
+    void updateReview() throws Exception {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+                .content("수정")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/review/{reviewId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"));
+    }
+
+    @DisplayName("리뷰를 수정할 때, 내용은 필수값이다.")
+    @Test
+    void updateReviewWithoutContent() throws Exception {
+        // given
+        ReviewUpdateRequest request = ReviewUpdateRequest.builder()
+//                .content("수정")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/review/{reviewId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("내용은 필수입니다."));
     }
 }
