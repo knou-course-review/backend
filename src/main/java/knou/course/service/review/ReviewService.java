@@ -88,4 +88,16 @@ public class ReviewService {
 
         return ReviewResponse.of(review);
     }
+
+    @Transactional
+    public void deleteReview(final Long reviewId, final Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_REVIEW, NOT_FOUND_REVIEW.getMessage()));
+
+        if (!userId.equals(review.getUserId())) {
+            throw new AppException(NOT_AUTHORITY, NOT_AUTHORITY.getMessage());
+        }
+
+        reviewRepository.delete(review);
+    }
 }

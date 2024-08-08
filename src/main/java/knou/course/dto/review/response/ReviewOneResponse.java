@@ -23,7 +23,7 @@ public class ReviewOneResponse {
     @Schema(example = "이 강의 추천합니다.")
     private String content;
 
-    @Schema(example = "true, false")
+    @Schema(example = "작성자 본인 여부 - true, false")
     private boolean isOwner;
 
     @Builder

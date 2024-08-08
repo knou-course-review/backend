@@ -59,4 +59,12 @@ public class ReviewController {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(reviewService.updateReview(reviewId, userId, request));
     }
+
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제합니다.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_REVIEW, NOT_AUTHORITY})
+    @DeleteMapping("/api/v1/review/{reviewId}")
+    public void deleteReview(@PathVariable Long reviewId, Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        reviewService.deleteReview(reviewId, userId);
+    }
 }

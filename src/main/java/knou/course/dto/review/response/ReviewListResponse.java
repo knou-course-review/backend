@@ -29,7 +29,7 @@ public class ReviewListResponse {
     @Schema(example = "13")
     private Long courseId;
 
-    @Schema(example = "true, false")
+    @Schema(example = "작성자 본인 여부 - true, false")
     private boolean isOwner;
 
     @Schema(example = "2024-08-08 13:11:21.122801")
