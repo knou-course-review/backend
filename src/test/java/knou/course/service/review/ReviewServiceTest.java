@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -156,6 +157,36 @@ class ReviewServiceTest {
 
         // when // then
         assertThatThrownBy(() -> reviewService.updateReview(review.getId(), userId, request))
+                .isInstanceOf(AppException.class)
+                .hasMessage("권한이 존재하지 않습니다.");
+    }
+
+    @DisplayName("리뷰를 삭제한다.")
+    @Test
+    void deleteReview() {
+        // given
+        final Long userId = 1L;
+        Review review = createReview("내용1", 1L, 1L);
+        reviewRepository.save(review);
+
+        // when
+        reviewService.deleteReview(review.getId(), userId);
+
+        // then
+        assertThatThrownBy(() -> reviewRepository.findById(review.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("리뷰를 삭제할 때, 본인이 작성한 리뷰가 아니면 예외가 발생한다.")
+    @Test
+    void deleteReviewWithNotAuthority() {
+        // given
+        final Long userId = 1L;
+        Review review = createReview("내용1", 1L, 2L);
+        reviewRepository.save(review);
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.deleteReview(review.getId(), userId))
                 .isInstanceOf(AppException.class)
                 .hasMessage("권한이 존재하지 않습니다.");
     }

@@ -174,4 +174,16 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("내용은 필수입니다."));
     }
+
+    @DisplayName("리뷰를 삭제한다.")
+    @Test
+    void deleteReview() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/review/{reviewId}", 1L).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }
