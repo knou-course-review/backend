@@ -5,15 +5,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.dto.review.response.ReviewResponse;
 import knou.course.exception.ErrorCode;
 import knou.course.service.review.ReviewService;
 import knou.course.swagger.ApiErrorCodeExamples;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static knou.course.exception.ErrorCode.INVALID_INPUT_VALUE;
 import static knou.course.exception.ErrorCode.NOT_FOUND_USER;
@@ -32,5 +31,13 @@ public class ReviewController {
                                                     Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(reviewService.createReview(request, userId));
+    }
+
+    @Operation(summary = "리뷰 페이징 조회 - size 10 고정", description = "리뷰를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
+    @GetMapping("/api/v2/reviews")
+    public ApiResponse<ReviewPagedResponse> getAllReviewsPaged(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                               Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ApiResponse.ok(reviewService.getAllReviewsPaged(page, userId));
     }
 }
