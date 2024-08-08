@@ -13,6 +13,7 @@ public enum ErrorCode {
     NOT_ADMIN(HttpStatus.FORBIDDEN, "ADMIN이 아닙니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다."),
     MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "인증번호 서비스에 문제가 발생하였습니다. 고객센터 문의 바랍니다."),
+    NOT_AUTHORITY(HttpStatus.FORBIDDEN, "권한이 존재하지 않습니다."),
 
     // User
     ALREADY_EXIST_USERNAME(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),

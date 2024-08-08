@@ -31,4 +31,8 @@ public class Review extends BaseEntity {
         this.courseId = courseId;
         this.content = content;
     }
+
+    public void updateReview(final String content) {
+        this.content = content;
+    }
 }

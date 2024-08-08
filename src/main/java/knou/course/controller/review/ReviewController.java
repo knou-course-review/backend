@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.request.ReviewUpdateRequest;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.dto.review.response.ReviewResponse;
@@ -47,5 +48,15 @@ public class ReviewController {
     public ApiResponse<ReviewOneResponse> getReviewById(@PathVariable Long reviewId, Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(reviewService.getReviewById(reviewId, userId));
+    }
+
+    @Operation(summary = "리뷰 수정", description = "리뷰를 수정합니다.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_REVIEW, NOT_AUTHORITY})
+    @PutMapping("/api/v1/review/{reviewId}")
+    public ApiResponse<ReviewResponse> updateReview(@PathVariable Long reviewId,
+                                                    Authentication authentication,
+                                                    @Valid @RequestBody ReviewUpdateRequest request) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ApiResponse.ok(reviewService.updateReview(reviewId, userId, request));
     }
 }

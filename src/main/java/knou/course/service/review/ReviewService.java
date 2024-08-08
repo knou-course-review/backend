@@ -5,6 +5,7 @@ import knou.course.domain.review.ReviewRepository;
 import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
 import knou.course.dto.review.request.ReviewCreateRequest;
+import knou.course.dto.review.request.ReviewUpdateRequest;
 import knou.course.dto.review.response.ReviewListResponse;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static knou.course.exception.ErrorCode.NOT_AUTHORITY;
 import static knou.course.exception.ErrorCode.NOT_FOUND_REVIEW;
 
 @RequiredArgsConstructor
@@ -71,5 +73,19 @@ public class ReviewService {
                 .orElseThrow(() -> new AppException(NOT_FOUND_REVIEW, NOT_FOUND_REVIEW.getMessage()));
 
         return ReviewOneResponse.of(review, userId);
+    }
+
+    @Transactional
+    public ReviewResponse updateReview(final Long reviewId, final Long userId, final ReviewUpdateRequest request) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_REVIEW, NOT_FOUND_REVIEW.getMessage()));
+
+        if (!userId.equals(review.getUserId())) {
+            throw new AppException(NOT_AUTHORITY, NOT_AUTHORITY.getMessage());
+        }
+
+        review.updateReview(request.getContent());
+
+        return ReviewResponse.of(review);
     }
 }
