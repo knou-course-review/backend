@@ -189,6 +189,102 @@ class CourseServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
+    @DisplayName("강의를 검색하여 페이징 조회한다. searchType = courseName, name = 이산수학")
+    @Test
+    void getAllCoursesPagedBySearchWithCourseName() {
+        // given
+        final Integer page = 1;
+        final String searchType = "courseName";
+        final String name = "이산수학";
+        Course course1 = createCourse(1L, 1L, "디지털논리회로");
+        Course course2 = createCourse(2L, 2L, "글쓰기");
+        Course course3 = createCourse(3L, 3L, "영어쓰기");
+        Course course4 = createCourse(4L, 4L, "이산수학");
+        courseRepository.saveAll(List.of(course1, course2, course3, course4));
+
+        // when
+        CoursePagedResponse pagedResponse = courseService.getAllCoursesPagedSearchBy(page, searchType, name);
+
+        // then
+        assertThat(pagedResponse.getContent()).hasSize(1)
+                .extracting("courseName", "professorId", "departmentId")
+                .containsExactly(
+                        tuple("이산수학", 4L, 4L)
+                );
+    }
+
+    @DisplayName("강의를 검색하여 페이징 조회한다. searchType = professorName, name = 홍길동")
+    @Test
+    void getAllCoursesPagedBySearchWithProfessorName() {
+        // given
+        final Integer page = 1;
+        final String searchType = "professorName";
+        final String name = "홍길동";
+
+        Department department1 = createDepartment("컴퓨터과학과");
+        Department department2 = createDepartment("국어국문학과");
+        Department department3 = createDepartment("영어영문학과");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        Professor professor1 = createProfessor("홍길동", department1);
+        Professor professor2 = createProfessor("국어국문학과교수", department2);
+        Professor professor3 = createProfessor("영어영문학과교수", department3);
+        professorRepository.saveAll(List.of(professor1, professor2, professor3));
+
+        Course course1 = createCourse(department1.getId(), professor1.getId(), "디지털논리회로");
+        Course course2 = createCourse(department2.getId(), professor2.getId(), "글쓰기");
+        Course course3 = createCourse(department3.getId(), professor3.getId(), "영어쓰기");
+        Course course4 = createCourse(department1.getId(), professor1.getId(), "이산수학");
+        courseRepository.saveAll(List.of(course1, course2, course3, course4));
+
+        // when
+        CoursePagedResponse pagedResponse = courseService.getAllCoursesPagedSearchBy(page, searchType, name);
+
+        // then
+        assertThat(pagedResponse.getContent()).hasSize(2)
+                .extracting("courseName", "professorName", "departmentName")
+                .containsExactlyInAnyOrder(
+                        tuple("이산수학", "홍길동", "컴퓨터과학과"),
+                        tuple("디지털논리회로", "홍길동", "컴퓨터과학과")
+                );
+    }
+
+    @DisplayName("강의를 검색하여 페이징 조회한다. searchType = departmentName, name = 컴퓨터과학과")
+    @Test
+    void getAllCoursesPagedBySearchWithDepartmentName() {
+        // given
+        final Integer page = 1;
+        final String searchType = "departmentName";
+        final String name = "컴퓨";
+
+        Department department1 = createDepartment("컴퓨터과학과");
+        Department department2 = createDepartment("국어국문학과");
+        Department department3 = createDepartment("영어영문학과");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        Professor professor1 = createProfessor("컴퓨터과학과교수", department1);
+        Professor professor2 = createProfessor("국어국문학과교수", department2);
+        Professor professor3 = createProfessor("영어영문학과교수", department3);
+        professorRepository.saveAll(List.of(professor1, professor2, professor3));
+
+        Course course1 = createCourse(department1.getId(), professor1.getId(), "디지털논리회로");
+        Course course2 = createCourse(department2.getId(), professor2.getId(), "글쓰기");
+        Course course3 = createCourse(department3.getId(), professor3.getId(), "영어쓰기");
+        Course course4 = createCourse(department1.getId(), professor1.getId(), "이산수학");
+        courseRepository.saveAll(List.of(course1, course2, course3, course4));
+
+        // when
+        CoursePagedResponse pagedResponse = courseService.getAllCoursesPagedSearchBy(page, searchType, name);
+
+        // then
+        assertThat(pagedResponse.getContent()).hasSize(2)
+                .extracting("courseName", "professorName", "departmentName")
+                .containsExactlyInAnyOrder(
+                        tuple("이산수학", "컴퓨터과학과교수", "컴퓨터과학과"),
+                        tuple("디지털논리회로", "컴퓨터과학과교수", "컴퓨터과학과")
+                );
+    }
+
     private Department createDepartment(final String departmentName) {
         return Department.builder()
                 .departmentName(departmentName)
