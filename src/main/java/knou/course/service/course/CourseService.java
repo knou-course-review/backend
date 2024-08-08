@@ -77,6 +77,34 @@ public class CourseService {
         return CoursePagedResponse.of(result, courses);
     }
 
+    public CoursePagedResponse getAllCoursesPagedSearchBy(Integer page, final String searchType, final String name) {
+        if (page < 1) {
+            page = 1;
+        }
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("courseName").ascending());
+        Page<Course> courses = null;
+
+        if (searchType.equals("professorName")) {
+            courses = courseRepository.customFindByProfessorId(name + "%", pageRequest);
+        } else if (searchType.equals("departmentName")) {
+            courses = courseRepository.customFindByDepartmentId(name + "%", pageRequest);
+        } else if (searchType.equals("courseName")) {
+            courses = courseRepository.customFindByCourseId(name + "%", pageRequest);
+        }
+
+        Map<Long, String> departmentNameMap = findDepartmentNamesBy(courses.getContent());
+
+        Map<Long, String> professorNameMap = findProfessorNamesBy(courses.getContent());
+
+        List<CourseListResponse> result = courses.getContent()
+                .stream()
+                .map(course -> CourseListResponse.of(course, professorNameMap, departmentNameMap))
+                .toList();
+
+        return CoursePagedResponse.of(result, courses);
+    }
+
     public CourseResponse getCourseById(final Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_COURSE, NOT_FOUND_COURSE.getMessage()));

@@ -74,4 +74,12 @@ public class CourseController {
         courseService.deleteCourse(courseId);
     }
 
+    @Operation(summary = "강의 검색, 페이징 조회 - size 10 고정", description = "학과명, 교수명, 강의명을 입력하여 강의를 검색합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE})
+    @GetMapping("/api/v2/courses/search")
+    public ApiResponse<CoursePagedResponse> getAllCoursesPagedSearchBy(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                       @RequestParam(defaultValue = "courseName") String searchType,
+                                                                       @RequestParam(required = false) String name) {
+        return ApiResponse.ok(courseService.getAllCoursesPagedSearchBy(page, searchType, name));
+    }
 }

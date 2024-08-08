@@ -290,4 +290,28 @@ class CourseControllerTest {
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
+
+    @DisplayName("강의를 검색하고 페이징 조회한다.")
+    @WithMockUser(username = "1", roles = "USER")
+    @Test
+    void getAllCoursesPagedBySearch() throws Exception {
+        // given
+        CoursePagedResponse result = CoursePagedResponse.builder().build();
+
+        BDDMockito.given(courseService.getAllCoursesPagedSearchBy(1, "courseName", "이산수학")).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v2/courses/search").with(csrf())
+                                .param("page", "1")
+                                .param("searchType", "courseName")
+                                .param("name", "이산수학")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
 }
