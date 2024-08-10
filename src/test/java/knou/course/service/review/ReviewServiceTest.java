@@ -44,13 +44,13 @@ class ReviewServiceTest {
     void createReview() {
         // given
         final Long userId = 1L;
+        final Long courseId = 1L;
         ReviewCreateRequest request = ReviewCreateRequest.builder()
                 .content("리뷰")
-                .courseId(1L)
                 .build();
 
         // when
-        ReviewResponse reviewResponse = reviewService.createReview(request, userId);
+        ReviewResponse reviewResponse = reviewService.createReview(request, userId, courseId);
 
         // then
         assertThat(reviewResponse.getId()).isNotNull();
@@ -65,15 +65,17 @@ class ReviewServiceTest {
     @Test
     void getAllReviewsPaged() {
         // given
+        final Long courseId = 1L;
         final Long userId = 1L;
         final Integer page = 1;
-        Review review1 = createReview("내용1", 1L, 1L);
-        Review review2 = createReview("내용2", 1L, 2L);
-        Review review3 = createReview("내용3", 1L, 3L);
-        reviewRepository.saveAll(List.of(review1, review2, review3));
+        Review review1 = createReview("내용1", courseId, 1L);
+        Review review2 = createReview("내용2", courseId, 2L);
+        Review review3 = createReview("내용3", courseId, 3L);
+        Review review4 = createReview("내용3", 2L, 3L);
+        reviewRepository.saveAll(List.of(review1, review2, review3, review4));
 
         // when
-        ReviewPagedResponse reviewPagedResponse = reviewService.getAllReviewsPaged(page, userId);
+        ReviewPagedResponse reviewPagedResponse = reviewService.getAllReviewsPaged(page, userId, courseId);
 
         // then
         assertThat(reviewPagedResponse.getContent()).hasSize(3)

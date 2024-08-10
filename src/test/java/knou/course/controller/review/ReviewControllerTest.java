@@ -55,13 +55,12 @@ class ReviewControllerTest {
     void createReview() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
-                .courseId(1L)
                 .content("리뷰")
                 .build();
 
         // when // then
         mockMvc.perform(
-                        post("/api/v1/review").with(csrf())
+                        post("/api/v1/course/{courseId}/review", 1L).with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
@@ -76,13 +75,12 @@ class ReviewControllerTest {
     void createReviewWithoutContent() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
-                .courseId(1L)
 //                .content("리뷰")
                 .build();
 
         // when // then
         mockMvc.perform(
-                        post("/api/v1/review").with(csrf())
+                        post("/api/v1/course/{courseId}/review", 1L).with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
@@ -99,11 +97,11 @@ class ReviewControllerTest {
         // given
         ReviewPagedResponse result = ReviewPagedResponse.builder().build();
 
-        BDDMockito.given(reviewService.getAllReviewsPaged(1, 1L)).willReturn(result);
+        BDDMockito.given(reviewService.getAllReviewsPaged(1, 1L, 1L)).willReturn(result);
 
         // when // then
         mockMvc.perform(
-                        get("/api/v2/reviews").with(csrf())
+                        get("/api/v2/course/{courseId}/reviews",1L).with(csrf())
                                 .param("page", "1")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )

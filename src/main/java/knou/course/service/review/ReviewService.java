@@ -34,19 +34,19 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ReviewResponse createReview(final ReviewCreateRequest request, final Long userId) {
-        Review savedReview = reviewRepository.save(request.toEntity(userId));
+    public ReviewResponse createReview(final ReviewCreateRequest request, final Long userId, final Long courseId) {
+        Review savedReview = reviewRepository.save(request.toEntity(userId, courseId));
 
         return ReviewResponse.of(savedReview);
     }
 
-    public ReviewPagedResponse getAllReviewsPaged(Integer page, final Long userId) {
+    public ReviewPagedResponse getAllReviewsPaged(Integer page, final Long userId, final Long courseId) {
         if (page < 1) {
             page = 1;
         }
 
         PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("id").descending());
-        Page<Review> reviews = reviewRepository.findAll(pageRequest);
+        Page<Review> reviews = reviewRepository.findAllByCourseId(courseId, pageRequest);
 
         Map<Long, String> usernameMap = findUsernamesBy(reviews.getContent());
 
