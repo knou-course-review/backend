@@ -36,7 +36,10 @@ public enum ErrorCode {
     NOT_FOUND_COURSE(HttpStatus.NOT_FOUND, "존재하지 않는 강의입니다."),
 
     // Review
-    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다.");
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
+
+    // Report
+    INVALID_SELF_REPORT(HttpStatus.BAD_REQUEST, "자기자신을 신고할 수 없습니다.");
 
     private final HttpStatus status;
 
