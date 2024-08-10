@@ -36,11 +36,12 @@ public class ReviewController {
     }
 
     @Operation(summary = "리뷰 페이징 조회 - size 10 고정", description = "리뷰를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
-    @GetMapping("/api/v2/reviews")
-    public ApiResponse<ReviewPagedResponse> getAllReviewsPaged(@RequestParam(value = "page", defaultValue = "1") Integer page,
+    @GetMapping("/api/v2/course/{courseId}/reviews")
+    public ApiResponse<ReviewPagedResponse> getAllReviewsPaged(@PathVariable Long courseId,
+                                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                                Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        return ApiResponse.ok(reviewService.getAllReviewsPaged(page, userId));
+        return ApiResponse.ok(reviewService.getAllReviewsPaged(page, userId, courseId));
     }
 
     @Operation(summary = "리뷰 단건 조회", description = "선택한 리뷰를 조회합니다.")

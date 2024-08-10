@@ -97,11 +97,11 @@ class ReviewControllerTest {
         // given
         ReviewPagedResponse result = ReviewPagedResponse.builder().build();
 
-        BDDMockito.given(reviewService.getAllReviewsPaged(1, 1L)).willReturn(result);
+        BDDMockito.given(reviewService.getAllReviewsPaged(1, 1L, 1L)).willReturn(result);
 
         // when // then
         mockMvc.perform(
-                        get("/api/v2/reviews").with(csrf())
+                        get("/api/v2/course/{courseId}/reviews",1L).with(csrf())
                                 .param("page", "1")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
