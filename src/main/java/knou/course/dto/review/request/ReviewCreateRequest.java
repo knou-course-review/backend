@@ -16,16 +16,12 @@ public class ReviewCreateRequest {
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
 
-    @Schema(example = "1")
-    private Long courseId;
-
     @Builder
-    public ReviewCreateRequest(final String content, final Long courseId) {
+    public ReviewCreateRequest(final String content) {
         this.content = content;
-        this.courseId = courseId;
     }
 
-    public Review toEntity(final Long userId) {
+    public Review toEntity(final Long userId, final Long courseId) {
         return Review.builder()
                 .userId(userId)
                 .courseId(courseId)

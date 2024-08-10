@@ -44,13 +44,13 @@ class ReviewServiceTest {
     void createReview() {
         // given
         final Long userId = 1L;
+        final Long courseId = 1L;
         ReviewCreateRequest request = ReviewCreateRequest.builder()
                 .content("리뷰")
-                .courseId(1L)
                 .build();
 
         // when
-        ReviewResponse reviewResponse = reviewService.createReview(request, userId);
+        ReviewResponse reviewResponse = reviewService.createReview(request, userId, courseId);
 
         // then
         assertThat(reviewResponse.getId()).isNotNull();

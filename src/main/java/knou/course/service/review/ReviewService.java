@@ -34,8 +34,8 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ReviewResponse createReview(final ReviewCreateRequest request, final Long userId) {
-        Review savedReview = reviewRepository.save(request.toEntity(userId));
+    public ReviewResponse createReview(final ReviewCreateRequest request, final Long userId, final Long courseId) {
+        Review savedReview = reviewRepository.save(request.toEntity(userId, courseId));
 
         return ReviewResponse.of(savedReview);
     }

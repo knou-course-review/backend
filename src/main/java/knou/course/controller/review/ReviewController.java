@@ -25,13 +25,14 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @Operation(summary = "리뷰 등록", description = "리뷰를 등록합니다.")
+    @Operation(summary = "리뷰 등록", description = "리뷰를 등록합니다. <br> 강의 단건 조회 화면에서 그 강의에 대한 리뷰를 등록합니다.")
     @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_USER})
-    @PostMapping("/api/v1/review")
-    public ApiResponse<ReviewResponse> createReview(@Valid @RequestBody ReviewCreateRequest request,
+    @PostMapping("/api/v1/course/{courseId}/review")
+    public ApiResponse<ReviewResponse> createReview(@PathVariable Long courseId,
+                                                     @Valid @RequestBody ReviewCreateRequest request,
                                                     Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        return ApiResponse.ok(reviewService.createReview(request, userId));
+        return ApiResponse.ok(reviewService.createReview(request, userId, courseId));
     }
 
     @Operation(summary = "리뷰 페이징 조회 - size 10 고정", description = "리뷰를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
