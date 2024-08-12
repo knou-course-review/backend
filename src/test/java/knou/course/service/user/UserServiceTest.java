@@ -1,12 +1,17 @@
 package knou.course.service.user;
 
+import knou.course.domain.course.Course;
+import knou.course.domain.department.Department;
 import knou.course.domain.mail.MailHistory;
 import knou.course.domain.mail.MailHistoryRepository;
+import knou.course.domain.professor.Professor;
 import knou.course.domain.user.Role;
 import knou.course.domain.user.Status;
 import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
+import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.user.request.*;
+import knou.course.dto.user.response.UserPagedResponse;
 import knou.course.dto.user.response.UserResponse;
 import knou.course.exception.AppException;
 import org.assertj.core.api.Assertions;
@@ -17,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static knou.course.exception.ErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION;
 import static knou.course.exception.ErrorCode.NOT_FOUND_USER;
@@ -357,6 +363,41 @@ class UserServiceTest {
 
         // then
         assertThat(userResponse.getId()).isNotNull();
+    }
+
+    @DisplayName("등록된 유저를 페이징 조회한다. 고정 size - 10, id 정렬까지 테스트")
+    @Test
+    void getAllUsersPaged() {
+        // given
+        final Integer page = 1;
+        User user1 = createUser("name1", "password", "user1@knou.ac.kr");
+        User user2 = createUser("name2", "password", "user2@knou.ac.kr");
+        User user3 = createUser("name3", "password", "user3@knou.ac.kr");
+        User user4 = createUser("name4", "password", "user4@knou.ac.kr");
+        User user5 = createUser("name5", "password", "user5@knou.ac.kr");
+        User user6 = createUser("name6", "password", "user6@knou.ac.kr");
+        User user7 = createUser("name7", "password", "user7@knou.ac.kr");
+        User user8 = createUser("name8", "password", "user8@knou.ac.kr");
+        User user9 = createUser("name9", "password", "user9@knou.ac.kr");
+        User user10 = createUser("name10", "password", "user10@knou.ac.kr");
+        User user11 = createUser("name11", "password", "user11@knou.ac.kr");
+        userRepository.saveAll(List.of(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11));
+
+        // when
+        UserPagedResponse pagedResponse = userService.getAllUsersPaged(page);
+
+        // then
+        assertThat(pagedResponse.getContent()).hasSize(10)
+                .extracting("username")
+                .containsExactly(
+                        "name1", "name2", "name3", "name4", "name5",
+                        "name6", "name7", "name8", "name9", "name10"
+                );
+        assertThat(pagedResponse)
+                .extracting("pageNumber", "pageSize", "totalElements", "totalPages", "first", "last")
+                .containsExactlyInAnyOrder(
+                        1, 10, 11L, 2, true, false
+                );
     }
 
     private User createUser(final String username, final String password, final String email) {

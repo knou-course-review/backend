@@ -41,4 +41,13 @@ public class User extends BaseEntity {
     public void changePassword(final String password) {
         this.password = password;
     }
+
+    public void changeUserStatus() {
+        if (this.status == Status.ACTIVE) {
+            this.status = Status.INACTIVE;
+            return;
+        }
+
+        this.status = Status.ACTIVE;
+    }
 }

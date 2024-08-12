@@ -5,15 +5,22 @@ import knou.course.domain.mail.MailHistoryRepository;
 import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
 import knou.course.dto.user.request.*;
+import knou.course.dto.user.response.UserListResponse;
+import knou.course.dto.user.response.UserPagedResponse;
 import knou.course.dto.user.response.UserResponse;
 import knou.course.exception.AppException;
 import knou.course.exception.ErrorCode;
 import knou.course.service.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static knou.course.exception.ErrorCode.*;
 
@@ -105,6 +112,31 @@ public class UserService {
         }
 
         user.changePassword(passwordEncoder.encode(request.getPassword()));
+        return UserResponse.of(user);
+    }
+
+    public UserPagedResponse getAllUsersPaged(Integer page) {
+        if (page < 1) {
+            page = 1;
+        }
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("id").ascending());
+        Page<User> users = userRepository.findAll(pageRequest);
+
+        List<UserListResponse> result = users.getContent()
+                .stream()
+                .map(UserListResponse::of)
+                .toList();
+
+        return UserPagedResponse.of(result, users);
+    }
+
+    @Transactional
+    public UserResponse updateUserStatus(final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        user.changeUserStatus();
         return UserResponse.of(user);
     }
 }
