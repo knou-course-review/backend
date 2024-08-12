@@ -7,6 +7,7 @@ import knou.course.dto.ApiResponse;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CourseOneResponse;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.exception.ErrorCode;
@@ -47,7 +48,7 @@ public class CourseController {
     @Operation(summary = "강의 단건 조회", description = "선택한 강의를 조회합니다.")
     @ApiErrorCodeExamples({NOT_FOUND_COURSE, INVALID_INPUT_VALUE})
     @GetMapping("/api/v1/course/{courseId}")
-    public ApiResponse<CourseResponse> getCourseById(@PathVariable Long courseId) {
+    public ApiResponse<CourseOneResponse> getCourseById(@PathVariable Long courseId) {
         return ApiResponse.ok(courseService.getCourseById(courseId));
     }
 

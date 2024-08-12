@@ -10,6 +10,7 @@ import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CourseOneResponse;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.exception.AppException;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static knou.course.exception.ErrorCode.NOT_FOUND_COURSE;
+import static knou.course.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -105,11 +106,20 @@ public class CourseService {
         return CoursePagedResponse.of(result, courses);
     }
 
-    public CourseResponse getCourseById(final Long courseId) {
+    public CourseOneResponse getCourseById(final Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_COURSE, NOT_FOUND_COURSE.getMessage()));
 
-        return CourseResponse.of(course);
+        String departmentName = departmentRepository.findById(course.getDepartmentId())
+                .map(Department::getDepartmentName)
+                .orElse(null);
+
+        String professorName = professorRepository.findById(course.getProfessorId())
+                .map(Professor::getProfessorName)
+                .orElse(null);
+
+
+        return CourseOneResponse.of(course, professorName, departmentName);
     }
 
     @Transactional
