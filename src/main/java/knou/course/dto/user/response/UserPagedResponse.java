@@ -30,7 +30,7 @@ public class UserPagedResponse {
     @Builder
     public UserPagedResponse(final List<UserListResponse> content, final int pageNumber, final int pageSize, final long totalElements, final int totalPages, final boolean first, final boolean last) {
         this.content = content;
-        this.pageNumber = pageNumber;
+        this.pageNumber = pageNumber + 1;
         this.pageSize = pageSize;
         this.totalElements = totalElements;
         this.totalPages = totalPages;
