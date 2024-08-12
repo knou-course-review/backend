@@ -1,5 +1,6 @@
 package knou.course.dto.user.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import knou.course.domain.user.Status;
 import knou.course.domain.user.User;
 import lombok.AccessLevel;
@@ -13,12 +14,16 @@ import java.time.LocalDateTime;
 @Getter
 public class UserListResponse {
 
+    @Schema(example = "1")
     private Long id;
 
+    @Schema(example = "user1")
     private String username;
 
+    @Schema(example = "user1@knou.ac.kr")
     private String email;
 
+    @Schema(example = "ACTIVE, INACTIVE")
     private Status status;
 
     private LocalDateTime createdAt;
