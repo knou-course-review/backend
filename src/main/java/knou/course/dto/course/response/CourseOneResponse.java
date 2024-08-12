@@ -1,5 +1,6 @@
 package knou.course.dto.course.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import knou.course.domain.course.Course;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,30 +11,47 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CourseOneResponse {
 
+    @Schema(example = "1")
     private Long id;
 
+    @Schema(example = "이산수학")
     private String courseName;
 
+    @Schema(example = "컴퓨터과학과")
     private String departmentName;
 
+    @Schema(example = "홍길동")
     private String professorName;
 
+    @Schema(example = "13")
+    private Long departmentId;
+
+    @Schema(example = "13")
+    private Long professorId;
+
+    @Schema(example = "3")
     private int grade;
 
+    @Schema(example = "3")
     private int credit;
 
+    @Schema(example = "출석")
     private String classType; // 수업유형(출석, 비출석)
 
+    @Schema(example = "전공")
     private String classification;
 
+    @Schema(example = "1학기")
     private String semester;
 
     @Builder
-    public CourseOneResponse(final Long id, final String courseName, final String departmentName, final String professorName, final int grade, final int credit, final String classType, final String classification, final String semester) {
+    public CourseOneResponse(final Long id, final String courseName, final String departmentName, final String professorName, final Long departmentId, final Long professorId, final int grade, final int credit, final String classType, final String classification, final String semester) {
         this.id = id;
         this.courseName = courseName;
         this.departmentName = departmentName;
         this.professorName = professorName;
+        this.departmentId = departmentId;
+        this.professorId = professorId;
         this.grade = grade;
         this.credit = credit;
         this.classType = classType;
@@ -47,6 +65,8 @@ public class CourseOneResponse {
                 .courseName(course.getCourseName())
                 .departmentName(departmentName)
                 .professorName(professorName)
+                .departmentId(course.getDepartmentId())
+                .professorId(course.getProfessorId())
                 .grade(course.getGrade())
                 .credit(course.getCredit())
                 .classType(course.getClassType())

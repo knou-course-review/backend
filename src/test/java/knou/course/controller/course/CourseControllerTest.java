@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CourseOneResponse;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import knou.course.dto.professor.request.ProfessorUpdateRequest;
@@ -144,7 +145,7 @@ class CourseControllerTest {
     @Test
     void getCourseById() throws Exception {
         // given
-        CourseResponse result = CourseResponse.builder().build();
+        CourseOneResponse result = CourseOneResponse.builder().build();
 
         BDDMockito.given(courseService.getCourseById(1L)).willReturn(result);
 

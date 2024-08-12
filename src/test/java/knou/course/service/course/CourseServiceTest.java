@@ -9,6 +9,7 @@ import knou.course.domain.professor.ProfessorRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
+import knou.course.dto.course.response.CourseOneResponse;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.course.response.CourseResponse;
 import org.assertj.core.api.Assertions;
@@ -109,7 +110,7 @@ class CourseServiceTest {
         courseRepository.save(course);
 
         // when
-        CourseResponse courseResponse = courseService.getCourseById(course.getId());
+        CourseOneResponse courseResponse = courseService.getCourseById(course.getId());
 
         // then
         assertThat(courseResponse.getId()).isNotNull();
