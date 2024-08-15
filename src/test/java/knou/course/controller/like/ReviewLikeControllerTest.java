@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,15 +46,31 @@ class ReviewLikeControllerTest {
     @Test
     void createReviewLike() throws Exception {
         // given
+        final Long reviewId = 1L;
 
         // when // then
         mockMvc.perform(
-                        post("/api/v1/like/{reviewId}", 1L).with(csrf())
+                        post("/api/v1/like/{reviewId}", reviewId).with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("OK"));
+    }
+
+    @DisplayName("리뷰 좋아요 취소")
+    @Test
+    void deleteReviewLike() throws Exception {
+        // given
+        final Long reviewId = 1L;
+
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/like/{reviewId}", reviewId).with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
