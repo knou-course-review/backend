@@ -8,6 +8,7 @@ import knou.course.service.like.ReviewLikeService;
 import knou.course.swagger.ApiErrorCodeExamples;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,15 @@ public class ReviewLikeController {
                                                             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(reviewLikeService.createReviewLike(reviewId, userId));
+    }
+
+    @Operation(summary = "리뷰 좋아요 취소", description = "리뷰에 좋아요를 취소합니다.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_LIKE})
+    @DeleteMapping("/api/v1/like/{reviewId}")
+    public void deleteReviewLike(@PathVariable Long reviewId,
+                                 Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        reviewLikeService.deleteReviewLike(reviewId, userId);
     }
 
 }

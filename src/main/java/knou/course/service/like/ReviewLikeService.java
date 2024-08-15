@@ -25,6 +25,14 @@ public class ReviewLikeService {
         return ReviewLikeResponse.of(savedReviewLike);
     }
 
+    @Transactional
+    public void deleteReviewLike(final Long reviewId, final Long userId) {
+        ReviewLike reviewLike = reviewLikeRepository.findByUserIdAndReviewId(userId, reviewId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_LIKE, ErrorCode.NOT_FOUND_LIKE.getMessage()));
+
+        reviewLikeRepository.deleteById(reviewLike.getId());
+    }
+
     private boolean isLiked(final Long reviewId, final Long userId) {
         return reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId);
     }
