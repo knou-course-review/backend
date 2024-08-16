@@ -22,6 +22,10 @@ public class ReportService {
             throw new AppException(ErrorCode.INVALID_SELF_REPORT, ErrorCode.INVALID_SELF_REPORT.getMessage());
         }
 
+        if (reportRepository.existsByTargetIdAndUserId(targetId, userId)) {
+            throw new AppException(ErrorCode.ALREADY_EXIST_REPORT, ErrorCode.ALREADY_EXIST_REPORT.getMessage());
+        }
+
         Report savedReport = reportRepository.save(request.toEntity(userId, targetId));
 
         return ReportResponse.of(savedReport);

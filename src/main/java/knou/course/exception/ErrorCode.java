@@ -40,6 +40,7 @@ public enum ErrorCode {
 
     // Report
     INVALID_SELF_REPORT(HttpStatus.BAD_REQUEST, "자기자신을 신고할 수 없습니다."),
+    ALREADY_EXIST_REPORT(HttpStatus.CONFLICT, "이미 신고하였습니다."),
 
     // Like Review
     ALREADY_EXIST_LIKE(HttpStatus.CONFLICT, "이미 좋아요를 눌렀습니다."),
