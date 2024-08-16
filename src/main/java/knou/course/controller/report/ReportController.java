@@ -25,7 +25,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @Operation(summary = "유저 신고", description = "유저를 신고합니다.")
-    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_USER, INVALID_SELF_REPORT})
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_USER, INVALID_SELF_REPORT, ALREADY_EXIST_REPORT})
     @PostMapping("/api/v1/report/{targetId}")
     public ApiResponse<ReportResponse> createReport(@PathVariable Long targetId,
                                                     @Valid @RequestBody ReportCreateRequest request,
