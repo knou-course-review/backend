@@ -18,16 +18,23 @@ public class ReportService {
 
     @Transactional
     public ReportResponse createReport(ReportCreateRequest request, final Long targetId, final Long userId) {
-        if (targetId.equals(userId)) {
-            throw new AppException(ErrorCode.INVALID_SELF_REPORT, ErrorCode.INVALID_SELF_REPORT.getMessage());
-        }
-
-        if (reportRepository.existsByTargetIdAndUserId(targetId, userId)) {
-            throw new AppException(ErrorCode.ALREADY_EXIST_REPORT, ErrorCode.ALREADY_EXIST_REPORT.getMessage());
-        }
+        validateSelfReport(targetId, userId);
+        validateDuplicateReport(targetId, userId);
 
         Report savedReport = reportRepository.save(request.toEntity(userId, targetId));
 
         return ReportResponse.of(savedReport);
+    }
+
+    private void validateDuplicateReport(final Long targetId, final Long userId) {
+        if (reportRepository.existsByTargetIdAndUserId(targetId, userId)) {
+            throw new AppException(ErrorCode.ALREADY_EXIST_REPORT, ErrorCode.ALREADY_EXIST_REPORT.getMessage());
+        }
+    }
+
+    private void validateSelfReport(final Long targetId, final Long userId) {
+        if (targetId.equals(userId)) {
+            throw new AppException(ErrorCode.INVALID_SELF_REPORT, ErrorCode.INVALID_SELF_REPORT.getMessage());
+        }
     }
 }
