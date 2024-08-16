@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static knou.course.exception.ErrorCode.*;
 
-@Tag(name = "Report Controller - 신고 컨트롤러", description = "회원을 신고합니다.")
+@Tag(name = "Report Controller - 신고 컨트롤러", description = "리뷰를 신고합니다.")
 @RequiredArgsConstructor
 @RestController
 public class ReportController {
 
     private final ReportService reportService;
 
-    @Operation(summary = "유저 신고", description = "유저를 신고합니다.")
+    @Operation(summary = "리뷰 신고", description = "리뷰를 신고합니다. targetId는 reviewId 값 입니다.")
     @ApiErrorCodeExamples({INVALID_INPUT_VALUE, NOT_FOUND_USER, INVALID_SELF_REPORT, ALREADY_EXIST_REPORT})
     @PostMapping("/api/v1/report/{targetId}")
     public ApiResponse<ReportResponse> createReport(@PathVariable Long targetId,

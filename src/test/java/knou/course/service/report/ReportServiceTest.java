@@ -49,21 +49,21 @@ class ReportServiceTest {
                 .containsExactlyInAnyOrder(1L, 2L, "신고내용");
     }
 
-    @DisplayName("유저를 신고할 때, 자기자신을 신고할 수 없다.")
-    @Test
-    void createReportNotSelfReport() {
-        // given
-        final Long userId = 1L;
-        final Long targetId = 1L;
-        ReportCreateRequest request = ReportCreateRequest.builder()
-                .content("신고내용")
-                .build();
-
-        // when // then
-        assertThatThrownBy(() -> reportService.createReport(request, targetId, userId))
-                .isInstanceOf(AppException.class)
-                .hasMessage("자기자신을 신고할 수 없습니다.");
-    }
+//    @DisplayName("유저를 신고할 때, 자기자신을 신고할 수 없다.")
+//    @Test
+//    void createReportNotSelfReport() {
+//        // given
+//        final Long userId = 1L;
+//        final Long targetId = 1L;
+//        ReportCreateRequest request = ReportCreateRequest.builder()
+//                .content("신고내용")
+//                .build();
+//
+//        // when // then
+//        assertThatThrownBy(() -> reportService.createReport(request, targetId, userId))
+//                .isInstanceOf(AppException.class)
+//                .hasMessage("자기자신을 신고할 수 없습니다.");
+//    }
 
     @DisplayName("유저를 신고할 때, 이미 신고 내역이 존재하면 예외가 발생한다.")
     @Test
