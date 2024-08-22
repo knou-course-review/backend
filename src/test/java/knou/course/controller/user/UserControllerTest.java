@@ -492,4 +492,16 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("비밀번호는 필수입니다."));
     }
+
+    @DisplayName("회원 탈퇴")
+    @Test
+    void deleteUser() throws Exception {
+        // when // then
+        mockMvc.perform(
+                        delete("/api/v1/users").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }

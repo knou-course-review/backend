@@ -24,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static knou.course.exception.ErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION;
 import static knou.course.exception.ErrorCode.NOT_FOUND_USER;
@@ -484,6 +485,22 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.modifyPassword(request, user.getId()))
                 .isInstanceOf(AppException.class)
                 .hasMessage("비밀번호가 일치하지 않습니다.");
+    }
+
+    @DisplayName("회원 탈퇴를 진행한다.")
+    @Test
+    void deleteUser() {
+        // given
+        final String email = "email@knou.ac.kr";
+        User user = createUser("username", "password", email);
+        userRepository.save(user);
+
+        // when
+        userService.deleteUser(user.getId());
+
+        // then
+        assertThatThrownBy(() -> userRepository.findById(user.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private User createUser(final String username, final String password, final String email) {
