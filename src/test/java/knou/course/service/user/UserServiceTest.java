@@ -400,6 +400,24 @@ class UserServiceTest {
                 );
     }
 
+    @DisplayName("로그인 중인 회원 정보를 조회한다.")
+    @Test
+    void getLoggedInUser() {
+        // given
+        final String email = "email@knou.ac.kr";
+        User user = createUser("username", "password", email);
+        userRepository.save(user);
+
+        // when
+        UserResponse userResponse = userService.getLoggedInUser(user.getId());
+
+        // then
+        assertThat(userResponse.getId()).isNotNull();
+        assertThat(userResponse)
+                .extracting("username", "email")
+                .containsExactlyInAnyOrder("username", "email@knou.ac.kr");
+    }
+
     private User createUser(final String username, final String password, final String email) {
         return User.builder()
                 .username(username)
