@@ -9,6 +9,7 @@ import knou.course.service.user.UserService;
 import knou.course.swagger.ApiErrorCodeExamples;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import static knou.course.exception.ErrorCode.*;
@@ -61,5 +62,13 @@ public class UserController {
     @PutMapping("/change-password")
     public ApiResponse<UserResponse> changePassword(@Valid @RequestBody UserChangePassword request) {
         return ApiResponse.ok(userService.changePassword(request));
+    }
+
+    @Operation(summary = "로그인 중인 내 정보 조회", description = "로그인 중인 username과 email을 불러옵니다.")
+    @ApiErrorCodeExamples({NOT_FOUND_USER, INVALID_INPUT_VALUE})
+    @GetMapping
+    public ApiResponse<UserResponse> getLoggedInUser(Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ApiResponse.ok(userService.getLoggedInUser(userId));
     }
 }

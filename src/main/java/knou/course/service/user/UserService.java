@@ -139,4 +139,11 @@ public class UserService {
         user.changeUserStatus();
         return UserResponse.of(user);
     }
+
+    public UserResponse getLoggedInUser(final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        return UserResponse.of(user);
+    }
 }
