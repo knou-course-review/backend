@@ -1,5 +1,6 @@
 package knou.course.service.user;
 
+import jakarta.validation.Valid;
 import knou.course.domain.mail.MailHistory;
 import knou.course.domain.mail.MailHistoryRepository;
 import knou.course.domain.user.User;
@@ -144,6 +145,23 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
 
+        return UserResponse.of(user);
+    }
+
+    @Transactional
+    public UserResponse modifyPassword(final UserModifyPasswordRequest request, final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        if (!passwordEncoder.matches(request.getNowPassword(), user.getPassword())) {
+            throw new AppException(NOT_MATCH_NOW_PASSWORD, NOT_MATCH_NOW_PASSWORD.getMessage());
+        }
+
+        if (!request.getPassword().equals(request.getRePassword())) {
+            throw new AppException(NOT_MATCH_PASSWORD, NOT_MATCH_PASSWORD.getMessage());
+        }
+
+        user.changePassword(passwordEncoder.encode(request.getPassword()));
         return UserResponse.of(user);
     }
 }

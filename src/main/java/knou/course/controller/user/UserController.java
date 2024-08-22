@@ -71,4 +71,13 @@ public class UserController {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(userService.getLoggedInUser(userId));
     }
+
+    @Operation(summary = "로그인 중인 상태에서 비밀번호 변경", description = "로그인 중 비밀번호 변경을 합니다.")
+    @ApiErrorCodeExamples({NOT_FOUND_USER, INVALID_INPUT_VALUE, NOT_MATCH_NOW_PASSWORD, NOT_MATCH_PASSWORD})
+    @PutMapping("/password")
+    public ApiResponse<UserResponse> modifyPassword(@Valid @RequestBody UserModifyPasswordRequest request,
+                                                    Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ApiResponse.ok(userService.modifyPassword(request, userId));
+    }
 }
