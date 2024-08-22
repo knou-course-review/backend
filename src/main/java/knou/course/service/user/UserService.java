@@ -153,15 +153,22 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
 
-        if (!passwordEncoder.matches(request.getNowPassword(), user.getPassword())) {
-            throw new AppException(NOT_MATCH_NOW_PASSWORD, NOT_MATCH_NOW_PASSWORD.getMessage());
-        }
-
-        if (!request.getPassword().equals(request.getRePassword())) {
-            throw new AppException(NOT_MATCH_PASSWORD, NOT_MATCH_PASSWORD.getMessage());
-        }
+        validateNowPassword(request, user);
+        validatePasswordMatch(request);
 
         user.changePassword(passwordEncoder.encode(request.getPassword()));
         return UserResponse.of(user);
+    }
+
+    private void validatePasswordMatch(final UserModifyPasswordRequest request) {
+        if (!request.getPassword().equals(request.getRePassword())) {
+            throw new AppException(NOT_MATCH_PASSWORD, NOT_MATCH_PASSWORD.getMessage());
+        }
+    }
+
+    private void validateNowPassword(final UserModifyPasswordRequest request, final User user) {
+        if (!passwordEncoder.matches(request.getNowPassword(), user.getPassword())) {
+            throw new AppException(NOT_MATCH_NOW_PASSWORD, NOT_MATCH_NOW_PASSWORD.getMessage());
+        }
     }
 }
