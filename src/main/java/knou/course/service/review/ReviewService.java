@@ -58,16 +58,6 @@ public class ReviewService {
         return ReviewPagedResponse.of(result, reviews);
     }
 
-    private Map<Long, String> findUsernamesBy(List<Review> reviews) {
-        List<Long> usernameIds = reviews.stream()
-                .map(Review::getUserId)
-                .toList();
-        List<User> users = userRepository.findAllById(usernameIds);
-
-        return users.stream()
-                .collect(Collectors.toMap(User::getId, User::getUsername));
-    }
-
     public ReviewOneResponse getReviewById(final Long reviewId, final Long userId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_REVIEW, NOT_FOUND_REVIEW.getMessage()));
@@ -99,5 +89,33 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
+    }
+
+    public ReviewPagedResponse getMyReviewsPaged(Integer page, final Long userId) {
+        if (page < 1) {
+            page = 1;
+        }
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("id").descending());
+        Page<Review> reviews = reviewRepository.findAllByUserId(userId, pageRequest);
+
+        Map<Long, String> usernameMap = findUsernamesBy(reviews.getContent());
+
+        List<ReviewListResponse> result = reviews.getContent()
+                .stream()
+                .map(review -> ReviewListResponse.of(review, usernameMap, userId))
+                .toList();
+
+        return ReviewPagedResponse.of(result, reviews);
+    }
+
+    private Map<Long, String> findUsernamesBy(List<Review> reviews) {
+        List<Long> usernameIds = reviews.stream()
+                .map(Review::getUserId)
+                .toList();
+        List<User> users = userRepository.findAllById(usernameIds);
+
+        return users.stream()
+                .collect(Collectors.toMap(User::getId, User::getUsername));
     }
 }

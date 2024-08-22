@@ -36,6 +36,7 @@ public class ReviewController {
     }
 
     @Operation(summary = "리뷰 페이징 조회 - size 10 고정", description = "리뷰를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE})
     @GetMapping("/api/v2/course/{courseId}/reviews")
     public ApiResponse<ReviewPagedResponse> getAllReviewsPaged(@PathVariable Long courseId,
                                                                @RequestParam(value = "page", defaultValue = "1") Integer page,
@@ -68,5 +69,14 @@ public class ReviewController {
     public void deleteReview(@PathVariable Long reviewId, Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         reviewService.deleteReview(reviewId, userId);
+    }
+
+    @Operation(summary = "본인이 작성한 리뷰 페이징 조회 - size 10 고정", description = "리뷰를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE})
+    @GetMapping("/api/v1/my-reviews")
+    public ApiResponse<ReviewPagedResponse> getMyReviewsPaged(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                               Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        return ApiResponse.ok(reviewService.getMyReviewsPaged(page, userId));
     }
 }

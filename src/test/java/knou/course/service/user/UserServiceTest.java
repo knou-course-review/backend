@@ -20,9 +20,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static knou.course.exception.ErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION;
 import static knou.course.exception.ErrorCode.NOT_FOUND_USER;
@@ -40,6 +42,9 @@ class UserServiceTest {
 
     @Autowired
     private MailHistoryRepository mailHistoryRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @AfterEach
     void tearDown() {
@@ -398,6 +403,104 @@ class UserServiceTest {
                 .containsExactlyInAnyOrder(
                         1, 10, 11L, 2, true, false
                 );
+    }
+
+    @DisplayName("로그인 중인 회원 정보를 조회한다.")
+    @Test
+    void getLoggedInUser() {
+        // given
+        final String email = "email@knou.ac.kr";
+        User user = createUser("username", "password", email);
+        userRepository.save(user);
+
+        // when
+        UserResponse userResponse = userService.getLoggedInUser(user.getId());
+
+        // then
+        assertThat(userResponse.getId()).isNotNull();
+        assertThat(userResponse)
+                .extracting("username", "email")
+                .containsExactlyInAnyOrder("username", "email@knou.ac.kr");
+    }
+
+    @DisplayName("로그인 중인 회원 비밀번호를 변경한다.")
+    @Test
+    void modifyPassword() {
+        // given
+        final String email = "email@knou.ac.kr";
+        final String password = "password";
+        User user = createUser("username", bCryptPasswordEncoder.encode(password), email);
+        userRepository.save(user);
+
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+                .nowPassword(password)
+                .password("changePassword")
+                .rePassword("changePassword")
+                .build();
+
+        // when
+        UserResponse userResponse = userService.modifyPassword(request, user.getId());
+
+        // then
+        assertThat(userResponse.getId()).isNotNull();
+    }
+
+    @DisplayName("로그인 중인 회원 비밀번호를 변경할 때, 현재 비밀번호가 다르면 예외가 발생한다.")
+    @Test
+    void modifyPasswordNotMatchNowPassword() {
+        // given
+        final String email = "email@knou.ac.kr";
+        final String password = "password";
+        User user = createUser("username", bCryptPasswordEncoder.encode(password), email);
+        userRepository.save(user);
+
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+                .nowPassword("missPassword")
+                .password("changePassword")
+                .rePassword("changePassword")
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> userService.modifyPassword(request, user.getId()))
+                .isInstanceOf(AppException.class)
+                .hasMessage("현재 비밀번호가 일치하지 않습니다.");
+    }
+
+    @DisplayName("로그인 중인 회원 비밀번호를 변경할 때, 변경 비밀번호와 재확인 비밀번호가 다르면 예외가 발생한다.")
+    @Test
+    void modifyPasswordWithPasswordNotMatchRePassword() {
+        // given
+        final String email = "email@knou.ac.kr";
+        final String password = "password";
+        User user = createUser("username", bCryptPasswordEncoder.encode(password), email);
+        userRepository.save(user);
+
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+                .nowPassword("password")
+                .password("changePassword")
+                .rePassword("missPassword")
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> userService.modifyPassword(request, user.getId()))
+                .isInstanceOf(AppException.class)
+                .hasMessage("비밀번호가 일치하지 않습니다.");
+    }
+
+    @DisplayName("회원 탈퇴를 진행한다.")
+    @Test
+    void deleteUser() {
+        // given
+        final String email = "email@knou.ac.kr";
+        User user = createUser("username", "password", email);
+        userRepository.save(user);
+
+        // when
+        userService.deleteUser(user.getId());
+
+        // then
+        assertThatThrownBy(() -> userRepository.findById(user.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private User createUser(final String username, final String password, final String email) {

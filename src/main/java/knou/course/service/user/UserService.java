@@ -1,5 +1,6 @@
 package knou.course.service.user;
 
+import jakarta.validation.Valid;
 import knou.course.domain.mail.MailHistory;
 import knou.course.domain.mail.MailHistoryRepository;
 import knou.course.domain.user.User;
@@ -138,5 +139,44 @@ public class UserService {
 
         user.changeUserStatus();
         return UserResponse.of(user);
+    }
+
+    public UserResponse getLoggedInUser(final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        return UserResponse.of(user);
+    }
+
+    @Transactional
+    public void deleteUser(final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserResponse modifyPassword(final UserModifyPasswordRequest request, final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        validateNowPassword(request, user);
+        validatePasswordMatch(request);
+
+        user.changePassword(passwordEncoder.encode(request.getPassword()));
+        return UserResponse.of(user);
+    }
+
+    private void validatePasswordMatch(final UserModifyPasswordRequest request) {
+        if (!request.getPassword().equals(request.getRePassword())) {
+            throw new AppException(NOT_MATCH_PASSWORD, NOT_MATCH_PASSWORD.getMessage());
+        }
+    }
+
+    private void validateNowPassword(final UserModifyPasswordRequest request, final User user) {
+        if (!passwordEncoder.matches(request.getNowPassword(), user.getPassword())) {
+            throw new AppException(NOT_MATCH_NOW_PASSWORD, NOT_MATCH_NOW_PASSWORD.getMessage());
+        }
     }
 }

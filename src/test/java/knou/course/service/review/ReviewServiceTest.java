@@ -193,6 +193,31 @@ class ReviewServiceTest {
                 .hasMessage("권한이 존재하지 않습니다.");
     }
 
+    @DisplayName("본인이 작성한 리뷰를 페이징 조회한다. 고정 size - 10, Id 정렬까지 테스트")
+    @Test
+    void getMyReviewsPaged() {
+        // given
+        final Long courseId = 1L;
+        final Long userId = 1L;
+        final Integer page = 1;
+        Review review1 = createReview("내용1", courseId, 1L);
+        Review review2 = createReview("내용2", courseId, 1L);
+        Review review3 = createReview("내용3", courseId, 3L);
+        Review review4 = createReview("내용3", 2L, 3L);
+        reviewRepository.saveAll(List.of(review1, review2, review3, review4));
+
+        // when
+        ReviewPagedResponse reviewPagedResponse = reviewService.getMyReviewsPaged(page, userId);
+
+        // then
+        assertThat(reviewPagedResponse.getContent()).hasSize(2)
+                .extracting("userId", "content", "isOwner")
+                .containsExactly(
+                        tuple(1L, "내용2", true),
+                        tuple(1L, "내용1", true)
+                );
+    }
+
     private Review createReview(final String content, final Long courseId, final Long userId) {
         return Review.builder()
                 .content(content)

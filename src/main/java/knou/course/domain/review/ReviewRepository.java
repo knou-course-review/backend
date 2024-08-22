@@ -8,4 +8,6 @@ import org.springframework.data.repository.query.Param;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findAllByCourseId(@Param("courseId") Long courseId, Pageable pageable);
+
+    Page<Review> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 }
