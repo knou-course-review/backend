@@ -184,4 +184,25 @@ class ReviewControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @DisplayName("리뷰를 페이징 조회한다.")
+    @Test
+    void getMyReviewsPaged() throws Exception {
+        // given
+        ReviewPagedResponse result = ReviewPagedResponse.builder().build();
+
+        BDDMockito.given(reviewService.getMyReviewsPaged(1, 1L)).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/my-reviews").with(csrf())
+                                .param("page", "1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
 }
