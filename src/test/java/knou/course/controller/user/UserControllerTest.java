@@ -401,4 +401,95 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
+
+    @DisplayName("로그인 중인 상태에서 비밀번를 변경한다.")
+    @Test
+    void modifyPassword() throws Exception {
+        // given
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+                .nowPassword("password")
+                .password("changePassword")
+                .rePassword("changePassword")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/users/password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"));
+    }
+
+    @DisplayName("로그인 중인 상태에서 비밀번를 변경할 때, 현재 비밀번호는 필수다.")
+    @Test
+    void modifyPasswordWithoutNowPassword() throws Exception {
+        // given
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+//                .nowPassword("password")
+                .password("changePassword")
+                .rePassword("changePassword")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/users/password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("비밀번호는 필수입니다."));
+    }
+
+    @DisplayName("로그인 중인 상태에서 비밀번를 변경할 때, 바꿀 비밀번호는 필수다.")
+    @Test
+    void modifyPasswordWithoutPassword() throws Exception {
+        // given
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+                .nowPassword("password")
+//                .password("changePassword")
+                .rePassword("changePassword")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/users/password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("비밀번호는 필수입니다."));
+    }
+
+    @DisplayName("로그인 중인 상태에서 비밀번를 변경할 때, 바꿀 재확인 비밀번호는 필수다.")
+    @Test
+    void modifyPasswordWithoutRePassword() throws Exception {
+        // given
+        UserModifyPasswordRequest request = UserModifyPasswordRequest.builder()
+                .nowPassword("password")
+                .password("changePassword")
+//                .rePassword("changePassword")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        put("/api/v1/users/password").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("비밀번호는 필수입니다."));
+    }
 }
