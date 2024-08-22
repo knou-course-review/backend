@@ -149,6 +149,14 @@ public class UserService {
     }
 
     @Transactional
+    public void deleteUser(final Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));
+
+        userRepository.delete(user);
+    }
+
+    @Transactional
     public UserResponse modifyPassword(final UserModifyPasswordRequest request, final Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(NOT_FOUND_USER, NOT_FOUND_USER.getMessage()));

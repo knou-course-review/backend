@@ -80,4 +80,12 @@ public class UserController {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(userService.modifyPassword(request, userId));
     }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 기능입니다.")
+    @ApiErrorCodeExamples({NOT_FOUND_USER, INVALID_INPUT_VALUE})
+    @DeleteMapping
+    public void deleteUser(Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        userService.deleteUser(userId);
+    }
 }
