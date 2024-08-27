@@ -1,15 +1,14 @@
 package knou.course.service.review;
 
+import knou.course.domain.course.Course;
+import knou.course.domain.course.CourseRepository;
 import knou.course.domain.review.Review;
 import knou.course.domain.review.ReviewRepository;
 import knou.course.domain.user.User;
 import knou.course.domain.user.UserRepository;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.request.ReviewUpdateRequest;
-import knou.course.dto.review.response.ReviewListResponse;
-import knou.course.dto.review.response.ReviewOneResponse;
-import knou.course.dto.review.response.ReviewPagedResponse;
-import knou.course.dto.review.response.ReviewResponse;
+import knou.course.dto.review.response.*;
 import knou.course.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +31,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
     @Transactional
     public ReviewResponse createReview(final ReviewCreateRequest request, final Long userId, final Long courseId) {
@@ -91,7 +91,7 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    public ReviewPagedResponse getMyReviewsPaged(Integer page, final Long userId) {
+    public ReviewMyPagedResponse getMyReviewsPaged(Integer page, final Long userId) {
         if (page < 1) {
             page = 1;
         }
@@ -100,14 +100,33 @@ public class ReviewService {
         Page<Review> reviews = reviewRepository.findAllByUserId(userId, pageRequest);
 
         Map<Long, String> usernameMap = findUsernamesBy(reviews.getContent());
+        Map<Long, String> courseNameMap = findCourseNamesBy(reviews.getContent());
 
-        List<ReviewListResponse> result = reviews.getContent()
+        List<ReviewMyListResponse> result = reviews.getContent()
                 .stream()
-                .map(review -> ReviewListResponse.of(review, usernameMap, userId))
+                .map(review -> ReviewMyListResponse.of(review, usernameMap, userId, courseNameMap))
                 .toList();
 
-        return ReviewPagedResponse.of(result, reviews);
+        return ReviewMyPagedResponse.of(result, reviews);
     }
+
+//    public ReviewPagedResponse getMyReviewsPaged(Integer page, final Long userId) {
+//        if (page < 1) {
+//            page = 1;
+//        }
+//
+//        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("id").descending());
+//        Page<Review> reviews = reviewRepository.findAllByUserId(userId, pageRequest);
+//
+//        Map<Long, String> usernameMap = findUsernamesBy(reviews.getContent());
+//
+//        List<ReviewListResponse> result = reviews.getContent()
+//                .stream()
+//                .map(review -> ReviewListResponse.of(review, usernameMap, userId))
+//                .toList();
+//
+//        return ReviewPagedResponse.of(result, reviews);
+//    }
 
     private Map<Long, String> findUsernamesBy(List<Review> reviews) {
         List<Long> usernameIds = reviews.stream()
@@ -117,5 +136,15 @@ public class ReviewService {
 
         return users.stream()
                 .collect(Collectors.toMap(User::getId, User::getUsername));
+    }
+
+    private Map<Long, String> findCourseNamesBy(List<Review> reviews) {
+        List<Long> courseIds = reviews.stream()
+                .map(Review::getCourseId)
+                .toList();
+        List<Course> courses = courseRepository.findAllById(courseIds);
+
+        return courses.stream()
+                .collect(Collectors.toMap(Course::getId, Course::getCourseName));
     }
 }

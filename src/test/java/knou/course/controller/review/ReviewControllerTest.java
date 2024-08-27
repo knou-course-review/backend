@@ -6,6 +6,7 @@ import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.request.ReviewUpdateRequest;
+import knou.course.dto.review.response.ReviewMyPagedResponse;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.service.review.ReviewService;
@@ -189,7 +190,7 @@ class ReviewControllerTest {
     @Test
     void getMyReviewsPaged() throws Exception {
         // given
-        ReviewPagedResponse result = ReviewPagedResponse.builder().build();
+        ReviewMyPagedResponse result = ReviewMyPagedResponse.builder().build();
 
         BDDMockito.given(reviewService.getMyReviewsPaged(1, 1L)).willReturn(result);
 
