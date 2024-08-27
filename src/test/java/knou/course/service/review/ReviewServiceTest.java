@@ -8,6 +8,7 @@ import knou.course.domain.review.ReviewRepository;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.request.ReviewUpdateRequest;
+import knou.course.dto.review.response.ReviewMyPagedResponse;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
 import knou.course.dto.review.response.ReviewResponse;
@@ -207,7 +208,7 @@ class ReviewServiceTest {
         reviewRepository.saveAll(List.of(review1, review2, review3, review4));
 
         // when
-        ReviewPagedResponse reviewPagedResponse = reviewService.getMyReviewsPaged(page, userId);
+        ReviewMyPagedResponse reviewPagedResponse = reviewService.getMyReviewsPaged(page, userId);
 
         // then
         assertThat(reviewPagedResponse.getContent()).hasSize(2)
