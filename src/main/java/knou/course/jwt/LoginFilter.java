@@ -50,7 +50,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException, ServletException {
         CustomUserDetails user = (CustomUserDetails) authResult.getPrincipal();
-        String accessToken = jwtUtil.createAccessToken(user.getUser(), 60*60*1000L);
+        String accessToken = jwtUtil.createAccessToken(user.getUser(), 24 * 60 * 60 * 1000 * 30L);
         response.addHeader("Authorization", "Bearer " + accessToken);
 
         log.info("successful authentication");
