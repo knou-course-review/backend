@@ -8,10 +8,7 @@ import knou.course.domain.review.ReviewRepository;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.request.ReviewUpdateRequest;
-import knou.course.dto.review.response.ReviewMyPagedResponse;
-import knou.course.dto.review.response.ReviewOneResponse;
-import knou.course.dto.review.response.ReviewPagedResponse;
-import knou.course.dto.review.response.ReviewResponse;
+import knou.course.dto.review.response.*;
 import knou.course.exception.AppException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -216,6 +213,30 @@ class ReviewServiceTest {
                 .containsExactly(
                         tuple(1L, "내용2", true),
                         tuple(1L, "내용1", true)
+                );
+    }
+
+    @DisplayName("강의에 작성된 리뷰 개수를 조회한다.")
+    @Test
+    void getReviewCount() {
+        // given
+        Review review1 = createReview("내용1", 1L, 1L);
+        Review review2 = createReview("내용2", 1L, 1L);
+        Review review3 = createReview("내용3", 2L, 2L);
+        Review review4 = createReview("내용4", 2L, 2L);
+        Review review5 = createReview("내용5", 3L, 3L);
+        reviewRepository.saveAll(List.of(review1, review2, review3, review4, review5));
+
+        // when
+        List<ReviewCountResponse> reviewCountResponse = reviewService.getReviewCountByCourseIds(List.of(1L, 2L, 3L));
+
+        // then
+        assertThat(reviewCountResponse).hasSize(3)
+                .extracting("courseId", "reviewCount")
+                .containsExactlyInAnyOrder(
+                        tuple(1L, 2L),
+                        tuple(2L, 2L),
+                        tuple(3L, 1L)
                 );
     }
 

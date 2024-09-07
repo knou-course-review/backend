@@ -6,6 +6,7 @@ import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CoursePagedResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.request.ReviewUpdateRequest;
+import knou.course.dto.review.response.ReviewCountResponse;
 import knou.course.dto.review.response.ReviewMyPagedResponse;
 import knou.course.dto.review.response.ReviewOneResponse;
 import knou.course.dto.review.response.ReviewPagedResponse;
@@ -205,5 +206,25 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.message").value("OK"))
                 .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+    @DisplayName("강의에 맞는 리뷰 개수를 조회한다.")
+    @Test
+    void getReviewCount() throws Exception {
+        // given
+        List<ReviewCountResponse> result = List.of();
+
+        BDDMockito.given(reviewService.getReviewCountByCourseIds(List.of())).willReturn(result);
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/v1/review-count").with(csrf())
+                                .param("courseIds", "1", "2", "3")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("OK"));
     }
 }

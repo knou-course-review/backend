@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -127,6 +129,32 @@ public class ReviewService {
 //
 //        return ReviewPagedResponse.of(result, reviews);
 //    }
+
+    public List<ReviewCountResponse> getReviewCountByCourseIds(List<Long> courseIds) {
+        List<Object[]> result = reviewRepository.countReviewByCourseIds(courseIds);
+
+        // 스트림을 사용해 데이터를 맵으로 변환
+        Map<Long, Long> reviewCountMap = convertToReviewCountMap(result);
+
+        // 결과 리스트 반환
+        return createReviewCountResponses(courseIds, reviewCountMap);
+    }
+
+    private Map<Long, Long> convertToReviewCountMap(final List<Object[]> result) {
+        return result.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],  // courseId
+                        row -> (Long) row[1],  // reviewCount
+                        (existing, replacement) -> existing));
+    }
+
+    private List<ReviewCountResponse> createReviewCountResponses(final List<Long> courseIds, final Map<Long, Long> reviewCountMap) {
+        return courseIds.stream()
+                .map(courseId -> ReviewCountResponse.of(
+                        courseId, reviewCountMap.getOrDefault(courseId, 0L)
+                ))
+                .collect(Collectors.toList());
+    }
 
     private Map<Long, String> findUsernamesBy(List<Review> reviews) {
         List<Long> usernameIds = reviews.stream()

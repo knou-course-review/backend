@@ -6,16 +6,15 @@ import jakarta.validation.Valid;
 import knou.course.dto.ApiResponse;
 import knou.course.dto.review.request.ReviewCreateRequest;
 import knou.course.dto.review.request.ReviewUpdateRequest;
-import knou.course.dto.review.response.ReviewMyPagedResponse;
-import knou.course.dto.review.response.ReviewOneResponse;
-import knou.course.dto.review.response.ReviewPagedResponse;
-import knou.course.dto.review.response.ReviewResponse;
+import knou.course.dto.review.response.*;
 import knou.course.exception.ErrorCode;
 import knou.course.service.review.ReviewService;
 import knou.course.swagger.ApiErrorCodeExamples;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static knou.course.exception.ErrorCode.*;
 
@@ -79,6 +78,14 @@ public class ReviewController {
                                                                 Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         return ApiResponse.ok(reviewService.getMyReviewsPaged(page, userId));
+    }
+
+    @Operation(summary = "리뷰 개수 조회", description = "강의 목록에서 강의에 등록된 리뷰 개수를 불러옵니다.")
+    @ApiErrorCodeExamples({INVALID_INPUT_VALUE})
+    @GetMapping("/api/v1/review-count")
+    public ApiResponse<List<ReviewCountResponse>> getReviewCount(@RequestParam List<Long> courseIds) {
+        List<ReviewCountResponse> result = reviewService.getReviewCountByCourseIds(courseIds);
+        return ApiResponse.ok(result);
     }
 
 //    @Operation(summary = "본인이 작성한 리뷰 페이징 조회 - size 10 고정", description = "리뷰를 페이징 조회합니다. <br> 게시글 정보는 data.content로 접근해주세요.")
