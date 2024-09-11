@@ -64,7 +64,8 @@ public class CourseService {
         }
 
         PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("courseName").ascending());
-        Page<Course> courses = courseRepository.findAll(pageRequest);
+//        Page<Course> courses = courseRepository.findAll(pageRequest);
+        Page<Course> courses = courseRepository.findCoursesPageByLatestReviewAndCourseName(pageRequest);
 
         Map<Long, String> departmentNameMap = findDepartmentNamesBy(courses.getContent());
 
