@@ -35,4 +35,10 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "WHERE c.courseName LIKE :name)")
     Page<Course> customFindByCourseId(@Param("name") String name, Pageable pageable);
 
+    @Query(value = "SELECT c " +
+            "FROM Course c " +
+            "LEFT JOIN Review r ON c.id = r.courseId " +
+            "GROUP BY c.id, c.courseName " +
+            "ORDER BY MAX(r.createdAt) desc, c.courseName")
+    Page<Course> findCoursesPageByLatestReviewAndCourseName(Pageable pageable);
 }

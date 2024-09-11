@@ -6,6 +6,8 @@ import knou.course.domain.department.Department;
 import knou.course.domain.department.DepartmentRepository;
 import knou.course.domain.professor.Professor;
 import knou.course.domain.professor.ProfessorRepository;
+import knou.course.domain.review.Review;
+import knou.course.domain.review.ReviewRepository;
 import knou.course.dto.course.request.CourseCreateRequest;
 import knou.course.dto.course.request.CourseUpdateRequest;
 import knou.course.dto.course.response.CourseListResponse;
@@ -40,11 +42,15 @@ class CourseServiceTest {
     @Autowired
     private DepartmentRepository departmentRepository;
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     @AfterEach
     void tearDown() {
         courseRepository.deleteAllInBatch();
         professorRepository.deleteAllInBatch();
         departmentRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
     }
 
     @DisplayName("강의를 등록한다.")
@@ -149,6 +155,42 @@ class CourseServiceTest {
                         tuple("글쓰기", "국어국문학과교수", "국어국문학과"),
                         tuple("디지털논리회로", "컴퓨터과학과교수", "컴퓨터과학과"),
                         tuple("영어쓰기", "영어영문학과교수", "영어영문학과")
+                );
+    }
+
+    @DisplayName("강의를 페이징 조회할 때, 리뷰 등록이 최신 순으로 정렬 후 나머지는 courseName으로 정렬한다.")
+    @Test
+    void findCoursesPageByLatestReviewAndCourseName() {
+        // given
+        final Integer page = 1;
+        Department department1 = createDepartment("컴퓨터과학과");
+        Department department2 = createDepartment("국어국문학과");
+        Department department3 = createDepartment("영어영문학과");
+        departmentRepository.saveAll(List.of(department1, department2, department3));
+
+        Professor professor1 = createProfessor("컴퓨터과학과교수", department1);
+        Professor professor2 = createProfessor("국어국문학과교수", department2);
+        Professor professor3 = createProfessor("영어영문학과교수", department3);
+        professorRepository.saveAll(List.of(professor1, professor2, professor3));
+
+        Course course1 = createCourse(department1.getId(), professor1.getId(), "디지털논리회로");
+        Course course2 = createCourse(department2.getId(), professor2.getId(), "글쓰기");
+        Course course3 = createCourse(department3.getId(), professor3.getId(), "영어쓰기");
+        courseRepository.saveAll(List.of(course1, course2, course3));
+
+        Review review = createReview(course3.getId(), 1L, "영어쓰기 과목에 리뷰");
+        reviewRepository.save(review);
+
+        // when
+        CoursePagedResponse pagedResponse = courseService.getAllCoursesPaged(page);
+
+        // then
+        assertThat(pagedResponse.getContent()).hasSize(3)
+                .extracting("courseName", "professorName", "departmentName")
+                .containsExactly(
+                        tuple("영어쓰기", "영어영문학과교수", "영어영문학과"),
+                        tuple("글쓰기", "국어국문학과교수", "국어국문학과"),
+                        tuple("디지털논리회로", "컴퓨터과학과교수", "컴퓨터과학과")
                 );
     }
 
@@ -309,6 +351,14 @@ class CourseServiceTest {
                 .classType("classType")
                 .classification("classification")
                 .semester("semester")
+                .build();
+    }
+
+    private Review createReview(final Long courseId, final Long userId, final String content) {
+        return Review.builder()
+                .courseId(courseId)
+                .userId(userId)
+                .content(content)
                 .build();
     }
 }
